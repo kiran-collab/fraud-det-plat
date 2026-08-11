@@ -1,0 +1,148 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: fraudplat-config
+  namespace: fraud
+data:
+  FP_MODEL_DIR: "s3://fraudplat-models/registry"
+  REDIS_URL: "redis://fraudplat-redis.fraud.svc.cluster.local:6379/0"
+  # Thresholds live in config, not in the image: retuning an operating point is
+  # a risk decision that should not require a model rebuild or a redeploy of
+  # code that has not changed.
+  FP_DECLINE_AT: "0.86"
+  FP_REVIEW_AT: "0.55"
+  FP_STEP_UP_AT: "0.35"
+  OMP_NUM_THREADS: "1"
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: fraudplat-scoring
+  namespace: fraud
+  labels: {app: fraudplat, component: scoring}
+spec:
+  replicas: 6
+  selector:
+    matchLabels: {app: fraudplat, component: scoring}
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 0     # never reduce authorization capacity during a deploy
+      maxSurge: 2
+  template:
+    metadata:
+      labels: {app: fraudplat, component: scoring}
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "8080"
+        prometheus.io/path: "/metrics"
+    spec:
+      serviceAccountName: fraudplat-scoring   # IRSA: S3 read for the model registry
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 10001
+        fsGroup: 10001
+      topologySpreadConstraints:
+        - maxSkew: 1
+          topologyKey: topology.kubernetes.io/zone
+          whenUnsatisfiable: ScheduleAnyway
+          labelSelector:
+            matchLabels: {app: fraudplat, component: scoring}
+      containers:
+        - name: api
+          image: ghcr.io/example/fraudplat-serving:0.1.0
+          ports: [{containerPort: 8080, name: http}]
+          envFrom:
+            - configMapRef: {name: fraudplat-config}
+          env:
+            - name: FP_AUDIT_SALT
+              valueFrom:
+                secretKeyRef: {name: fraudplat-secrets, key: audit-salt}
+          resources:
+            # CPU request sized from the measured p50 (~2.6ms/txn on the ONNX
+            # path). Limit is 2x request to absorb bursts without throttling,
+            # which on a latency-critical service is worse than scheduling less
+            # densely. Memory is dominated by the ONNX isolation forest graph.
+            requests: {cpu: "1000m", memory: "1Gi"}
+            limits: {cpu: "2000m", memory: "2Gi"}
+          startupProbe:
+            # Model load plus ONNX session construction takes several seconds;
+            # a startup probe keeps that off the liveness budget so a slow cold
+            # start is not mistaken for a hung process.
+            httpGet: {path: /ready, port: http}
+            failureThreshold: 20
+            periodSeconds: 3
+          readinessProbe:
+            httpGet: {path: /ready, port: http}
+            periodSeconds: 5
+            timeoutSeconds: 2
+          livenessProbe:
+            httpGet: {path: /health, port: http}
+            periodSeconds: 15
+            timeoutSeconds: 3
+            failureThreshold: 3
+          lifecycle:
+            preStop:
+              # Let in-flight authorizations finish and endpoints propagate
+              # before the process goes away.
+              exec: {command: ["sleep", "5"]}
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities: {drop: ["ALL"]}
+          volumeMounts:
+            - {name: tmp, mountPath: /tmp}
+            - {name: model-cache, mountPath: /app/artifacts}
+      volumes:
+        - name: tmp
+          emptyDir: {}
+        - name: model-cache
+          emptyDir: {sizeLimit: 4Gi}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: fraudplat-scoring
+  namespace: fraud
+spec:
+  selector: {app: fraudplat, component: scoring}
+  ports: [{port: 80, targetPort: http, name: http}]
+---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: fraudplat-scoring
+  namespace: fraud
+spec:
+  minAvailable: 4
+  selector:
+    matchLabels: {app: fraudplat, component: scoring}
+---
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: fraudplat-scoring
+  namespace: fraud
+spec:
+  scaleTargetRef: {apiVersion: apps/v1, kind: Deployment, name: fraudplat-scoring}
+  minReplicas: 6
+  maxReplicas: 60
+  metrics:
+    - type: Resource
+      resource:
+        name: cpu
+        target: {type: Utilization, averageUtilization: 60}
+    # Scaling on latency as well as CPU: this service can be latency-bound on
+    # the Redis round trip while CPU still looks idle, and CPU alone would
+    # never trigger a scale-out for that.
+    - type: Pods
+      pods:
+        metric: {name: fraudplat_scoring_latency_p99_seconds}
+        target: {type: AverageValue, averageValue: "30m"}
+  behavior:
+    scaleUp:
+      stabilizationWindowSeconds: 30    # card fraud arrives in bursts
+      policies: [{type: Percent, value: 100, periodSeconds: 30}]
+    scaleDown:
+      stabilizationWindowSeconds: 300   # shed capacity slowly
+      policies: [{type: Percent, value: 20, periodSeconds: 60}]

@@ -1,0 +1,55 @@
+# Scoring API image.
+#
+# Multi-stage so the runtime layer carries no compilers or build headers -
+# a smaller image is faster to pull on a scale-out event, which for an
+# authorization service is a latency concern, not just a storage one.
+
+FROM python:3.11-slim AS builder
+
+ENV PIP_NO_CACHE_DIR=1 PIP_DISABLE_PIP_VERSION_CHECK=1
+RUN apt-get update && apt-get install -y --no-install-recommends \
+        build-essential libgomp1 \
+    && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /build
+COPY pyproject.toml README.md ./
+COPY src/ ./src/
+RUN python -m venv /opt/venv \
+    && /opt/venv/bin/pip install --upgrade pip \
+    && /opt/venv/bin/pip install ".[serving,explain]"
+
+
+FROM python:3.11-slim AS runtime
+
+# libgomp is required at runtime by LightGBM's OpenMP backend even though the
+# compiler is not - omitting it produces an import error only under load.
+RUN apt-get update && apt-get install -y --no-install-recommends libgomp1 curl \
+    && rm -rf /var/lib/apt/lists/* \
+    && useradd --create-home --uid 10001 fraudplat
+
+COPY --from=builder /opt/venv /opt/venv
+ENV PATH="/opt/venv/bin:$PATH" \
+    PYTHONUNBUFFERED=1 \
+    PYTHONDONTWRITEBYTECODE=1 \
+    # ONNX Runtime and OpenMP both default to one thread per core. This service
+    # scales by process count, not by threads per request; leaving these unset
+    # makes every worker fight for every core and inflates p99 under load.
+    OMP_NUM_THREADS=1 \
+    OPENBLAS_NUM_THREADS=1 \
+    MKL_NUM_THREADS=1
+
+WORKDIR /app
+COPY --chown=fraudplat:fraudplat src/ ./src/
+ENV PYTHONPATH=/app/src
+
+USER fraudplat
+EXPOSE 8080
+
+HEALTHCHECK --interval=15s --timeout=3s --start-period=40s --retries=3 \
+    CMD curl -fsS http://localhost:8080/ready || exit 1
+
+# One uvicorn worker per container; concurrency comes from replicas, which the
+# HPA can scale on the latency metric.
+CMD ["uvicorn", "fraudplat.serving.app:app", \
+     "--host", "0.0.0.0", "--port", "8080", \
+     "--workers", "1", "--loop", "uvloop", "--no-access-log"]

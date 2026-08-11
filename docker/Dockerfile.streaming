@@ -1,0 +1,44 @@
+# Kafka -> feature store writer.
+#
+# Separate image from the API: it has different dependencies (Kafka client, no
+# web server), a different scaling signal (consumer lag, not request rate) and
+# a different failure mode. Sharing one image would couple their release
+# cycles for no benefit.
+
+FROM python:3.11-slim AS builder
+
+ENV PIP_NO_CACHE_DIR=1 PIP_DISABLE_PIP_VERSION_CHECK=1
+RUN apt-get update && apt-get install -y --no-install-recommends build-essential \
+    && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /build
+COPY pyproject.toml README.md ./
+COPY src/ ./src/
+RUN python -m venv /opt/venv \
+    && /opt/venv/bin/pip install --upgrade pip \
+    && /opt/venv/bin/pip install ".[streaming,serving]"
+
+
+FROM python:3.11-slim AS runtime
+
+RUN apt-get update && apt-get install -y --no-install-recommends libgomp1 \
+    && rm -rf /var/lib/apt/lists/* \
+    && useradd --create-home --uid 10001 fraudplat
+
+COPY --from=builder /opt/venv /opt/venv
+ENV PATH="/opt/venv/bin:$PATH" \
+    PYTHONUNBUFFERED=1 \
+    PYTHONDONTWRITEBYTECODE=1 \
+    OMP_NUM_THREADS=1
+
+WORKDIR /app
+COPY --chown=fraudplat:fraudplat src/ ./src/
+COPY --chown=fraudplat:fraudplat scripts/ ./scripts/
+ENV PYTHONPATH=/app/src
+
+USER fraudplat
+
+# SIGTERM is handled in FeatureStreamWriter so in-flight messages are written
+# and offsets committed before the pod exits.
+STOPSIGNAL SIGTERM
+CMD ["python", "scripts/run_stream_writer.py"]
