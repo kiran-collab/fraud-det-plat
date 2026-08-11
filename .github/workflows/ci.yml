@@ -1,0 +1,110 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  PYTHONUNBUFFERED: "1"
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: "3.11", cache: pip}
+      - run: pip install ruff
+      - run: ruff check src tests scripts
+      - run: ruff format --check src tests scripts
+
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.11", "3.12"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: "${{ matrix.python-version }}", cache: pip}
+      - run: pip install -e ".[serving,explain,dev]"
+      - run: pytest --cov=fraudplat --cov-report=xml --cov-report=term-missing
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: coverage-${{ matrix.python-version }}
+          path: coverage.xml
+
+  # The unit tests use small models and would not catch a break in the actual
+  # train -> export -> serve path. This job runs that path end to end on a
+  # reduced dataset, which is what catches things like an ONNX converter
+  # upgrade silently changing an opset requirement.
+  pipeline-smoke:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: "3.11", cache: pip}
+      - run: pip install -e ".[serving,export,explain,dev]"
+
+      - name: Train a small model
+        run: python scripts/train.py --rows 40000 --epochs 1 --promote
+
+      - name: Export to ONNX
+        # Fails on a numerical-parity regression, not just on a crash.
+        run: python scripts/export_onnx.py
+
+      - name: Build the case index
+        run: python scripts/build_case_index.py --max-cases 500
+
+      - name: Governance checks
+        # Non-strict: a 40k-row smoke dataset legitimately trips drift and
+        # fairness thresholds tuned for production volume. The point here is
+        # that the checks execute, not that they pass.
+        run: python scripts/governance_report.py
+
+      - name: End-to-end demo
+        run: python scripts/demo.py
+
+      - name: Latency budget
+        run: python scripts/benchmark_inference.py --iterations 200
+
+  build-images:
+    runs-on: ubuntu-latest
+    needs: [test]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: docker/setup-buildx-action@v3
+      - name: Build serving image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: docker/Dockerfile.serving
+          push: false
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+      - name: Build streaming image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: docker/Dockerfile.streaming
+          push: false
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  terraform:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: hashicorp/setup-terraform@v3
+      - run: terraform fmt -check -recursive infra/
+      - run: terraform init -backend=false
+        working-directory: infra/terraform
+      - run: terraform validate
+        working-directory: infra/terraform

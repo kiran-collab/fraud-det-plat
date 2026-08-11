@@ -1,0 +1,15 @@
+.venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ruff_cache/
+.coverage
+coverage.xml
+artifacts/
+*.onnx
+*.parquet
+.env
+.DS_Store
+fraud_pipeline.yaml
+.terraform/
+*.tfstate*

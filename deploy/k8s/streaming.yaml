@@ -1,0 +1,84 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: fraudplat-feature-writer
+  namespace: fraud
+  labels: {app: fraudplat, component: feature-writer}
+spec:
+  # Replica count is bounded by partition count: a Kafka partition is consumed
+  # by exactly one member of a group, so replicas beyond the partition count
+  # sit idle. The transactions topic is provisioned with 24 partitions.
+  replicas: 12
+  selector:
+    matchLabels: {app: fraudplat, component: feature-writer}
+  strategy:
+    # Recreate, not RollingUpdate. During a rolling update old and new pods are
+    # briefly in the group together, which triggers a rebalance while both are
+    # mid-batch. Card state is read-modify-write with no lock (safe only
+    # because one consumer owns a card), so an overlapping rebalance can
+    # interleave two writers on the same card and corrupt velocity features.
+    type: Recreate
+  template:
+    metadata:
+      labels: {app: fraudplat, component: feature-writer}
+    spec:
+      serviceAccountName: fraudplat-streaming
+      securityContext: {runAsNonRoot: true, runAsUser: 10001}
+      terminationGracePeriodSeconds: 60   # drain in-flight messages, commit offsets
+      containers:
+        - name: writer
+          image: ghcr.io/example/fraudplat-streaming:0.1.0
+          envFrom:
+            - configMapRef: {name: fraudplat-config}
+          env:
+            - name: KAFKA_BOOTSTRAP_SERVERS
+              valueFrom:
+                secretKeyRef: {name: fraudplat-secrets, key: kafka-bootstrap}
+            - name: KAFKA_TXN_TOPIC
+              value: transactions.raw
+            - name: KAFKA_GROUP
+              value: fraudplat-feature-writer
+          resources:
+            requests: {cpu: "500m", memory: "512Mi"}
+            limits: {cpu: "1500m", memory: "1Gi"}
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities: {drop: ["ALL"]}
+          volumeMounts: [{name: tmp, mountPath: /tmp}]
+      volumes:
+        - name: tmp
+          emptyDir: {}
+---
+# Scale on consumer lag rather than CPU. The writer is I/O bound on Redis, so
+# it can fall arbitrarily far behind the stream while CPU looks comfortable -
+# and lag is the thing that actually degrades scoring, because the API reads
+# stale card state.
+apiVersion: keda.sh/v1alpha1
+kind: ScaledObject
+metadata:
+  name: fraudplat-feature-writer
+  namespace: fraud
+spec:
+  scaleTargetRef: {name: fraudplat-feature-writer}
+  minReplicaCount: 4
+  maxReplicaCount: 24     # == partition count; more would idle
+  cooldownPeriod: 300
+  triggers:
+    - type: kafka
+      metadata:
+        bootstrapServers: kafka.fraud.svc.cluster.local:9092
+        consumerGroup: fraudplat-feature-writer
+        topic: transactions.raw
+        lagThreshold: "5000"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: fraudplat-redis
+  namespace: fraud
+spec:
+  # ElastiCache in production; this ExternalName keeps the in-cluster DNS name
+  # stable so no application config changes between environments.
+  type: ExternalName
+  externalName: fraudplat-online-store.abc123.ng.0001.use1.cache.amazonaws.com

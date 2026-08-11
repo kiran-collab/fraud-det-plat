@@ -1,0 +1,17 @@
+project: fraudplat
+provider: aws
+registry:
+  registry_type: sql
+  path: ${FEAST_REGISTRY_URI}
+
+online_store:
+  type: redis
+  connection_string: ${FEAST_REDIS_CONNECTION}
+
+offline_store:
+  type: file
+
+entity_key_serialization_version: 3
+
+flags:
+  alpha_features: true
