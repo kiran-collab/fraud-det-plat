@@ -58,7 +58,10 @@ decide: approve, challenge, queue for review, or decline.
 ## Measured results
 
 From `make train` on 120k synthetic transactions (0.85% fraud prevalence),
-scored on a **chronologically held-out** test window:
+scored on a **chronologically held-out** test window.
+
+> New to these metrics? **[Jump to the glossary](#glossary--every-term-above-defined)** —
+> every term below is defined there against this exact run's numbers.
 
 | Scorer | PR-AUC | ROC-AUC | Recall @ 1% FPR | Precision @ 0.86 | Fraud value stopped |
 |---|---|---|---|---|---|
@@ -117,6 +120,207 @@ actually **85% of total latency** — scikit-learn's per-call validation and
 joblib dispatch overhead, amortised over a batch but catastrophic on a batch of
 one. Exporting the other two models first produced almost no end-to-end
 improvement; the benchmark is what surfaced why.
+
+---
+
+## Glossary — every term above, defined
+
+Everything here is anchored to **one real example**: the held-out test window
+from `make train`. Learn this table and every metric below becomes arithmetic
+you can do in your head.
+
+### The one example
+
+18,000 transactions were scored. 152 were actually fraud. At the decline
+threshold of 0.86, the model flagged 43 of them.
+
+|  | **Actually fraud** | **Actually legitimate** | total |
+|---|---|---|---|
+| **Model said fraud** (flagged 43) | **37** ✓ caught | **6** ✗ wrongly blocked | 43 |
+| **Model said fine** | **115** ✗ missed | **17,842** ✓ correctly allowed | 17,957 |
+| total | 152 | 17,848 | 18,000 |
+
+Those four numbers have names, and **every** metric in this README is a ratio
+built from them.
+
+| Term | Means | Here |
+|---|---|---|
+| **True Positive (TP)** | flagged, and it really was fraud — a catch | 37 |
+| **False Positive (FP)** | flagged, but it was a real customer — a *false decline* | 6 |
+| **False Negative (FN)** | not flagged, but it was fraud — a *miss*, money lost | 115 |
+| **True Negative (TN)** | not flagged, and it was fine — the boring majority | 17,842 |
+| **Prevalence** | how much of the data is actually fraud | 152/18,000 = **0.84%** |
+
+> **Why prevalence dominates everything.** At 0.84%, a model that simply says
+> "never fraud" is **99.16% accurate**. That's why the word *accuracy* appears
+> nowhere in this project — it's a useless metric here, and any fraud system
+> quoting it is hiding something.
+
+### The two ratios everyone mixes up
+
+Both are fractions of the "caught" number 37. They differ only in the
+denominator, and that is the whole trick:
+
+**Precision = TP / (TP + FP)** — *of everything I flagged, how much was really fraud?*
+→ 37 / 43 = **0.86**. When we decline, we're right 86% of the time.
+**Precision is about not annoying customers.**
+
+**Recall = TP / (TP + FN)** — *of all the fraud that existed, how much did I catch?*
+→ 37 / 152 = **0.24**. We caught about a quarter of it.
+**Recall is about not losing money.**
+
+> **The memory hook.** Point at the box, then ask:
+> *Precision* looks at the **column you flagged** — "was I right?"
+> *Recall* looks at the **row of real fraud** — "did I get them all?"
+>
+> Or in one sentence: **precision is how often you're right when you speak;
+> recall is how often you speak when you should.**
+
+**They trade against each other.** Lower the threshold and you flag more —
+recall goes up, precision goes down. You can see the exact see-saw in this
+project's own numbers:
+
+| Threshold | Precision | Recall | Meaning |
+|---|---|---|---|
+| 0.35 | 0.449 | 0.724 | catch most fraud, but over half of flags are wrong |
+| 0.55 | 0.612 | 0.539 | balanced |
+| 0.70 | 0.733 | 0.362 | |
+| 0.86 | 0.860 | 0.243 | rarely wrong, but misses three-quarters of fraud |
+
+**There is no "best" row.** Which one you pick *is* the business decision — and
+it's why these live in a ConfigMap, changeable without retraining.
+
+### Rate terms
+
+**False Positive Rate (FPR) = FP / (FP + TN)** — *of all the legitimate
+customers, what fraction did I wrongly block?*
+→ 6 / 17,848 = **0.034%**.
+
+> **FPR vs precision — the confusion worth clearing up once.** Both involve
+> false positives, but FPR divides by *all legitimate traffic* (17,848) while
+> precision divides by *what you flagged* (43). Because legitimate traffic is
+> enormous, FPR always looks tiny and reassuring. A 1% FPR sounds harmless — but
+> here it means **178 wrongly blocked customers to catch 115 frauds**: precision
+> collapses to 0.39, so most of your declines would be wrong.
+> **FPR is the operations view; precision is the customer's view.** Always
+> convert an FPR into a headcount before agreeing to it.
+
+**Recall @ 1% FPR = 0.757** — *"if we accept wrongly blocking 1% of good
+customers, what fraction of fraud can we catch?"* → 75.7%.
+
+This is the single most useful number in the whole table, because it fixes the
+cost and asks about the benefit. Comparing two models by recall alone is
+meaningless (any model gets 100% recall by flagging everything); comparing them
+at the *same* FPR is a fair fight. 1% is the level a fraud-operations team can
+realistically staff.
+
+**Alerts per 10,000 transactions** — how many cases land in the human review
+queue. → 23.9 at threshold 0.86. This is a **staffing number**: multiply by
+daily volume to get how many analysts you need to hire.
+
+### Threshold and operating point
+
+**Threshold** — the model outputs a score from 0 to 1. The threshold is the
+line where you act. Above 0.86 → decline.
+
+**Operating point** — one chosen threshold and the whole set of consequences
+that follow (precision, recall, FPR, queue size). Moving the threshold slides
+you along the trade-off; it does **not** make the model better. Improving the
+model moves the whole curve.
+
+### The two curves (single-number summaries)
+
+A threshold gives you one point. Sweeping *every possible* threshold traces a
+curve, and the **area under that curve (AUC)** compresses the model's whole
+quality into one number — useful for comparing models without arguing about
+thresholds first.
+
+**ROC-AUC = 0.988.** Plots recall against FPR. Interpretation: *pick one random
+fraud and one random legitimate transaction — how often does the model score the
+fraud higher?* 98.8% of the time. 0.5 = coin flip, 1.0 = perfect.
+
+**PR-AUC = 0.618.** Plots precision against recall. Roughly: *average precision
+across all recall levels.* A coin flip scores ≈ prevalence (0.0084 here), not
+0.5 — so **0.618 is ~73× better than random**.
+
+> **Why this project reports PR-AUC as the headline and treats ROC-AUC as
+> decoration.** Look at the gap: 0.988 vs 0.618, same model, same data.
+>
+> ROC-AUC's denominator is dominated by the 17,848 legitimate transactions. You
+> can add hundreds of false positives and FPR barely moves, so ROC-AUC stays
+> near 0.99 while precision in the alerting band quietly collapses. It flatters
+> every rare-event model.
+>
+> PR-AUC ignores true negatives entirely — it only looks at what you flagged
+> and what you caught. That's exactly where the pain is. **When prevalence is
+> under a few percent, believe PR-AUC.**
+
+### The money view
+
+**Value recall (a.k.a. "fraud value stopped") = 68.0%** — of all the fraud
+*dollars*, what fraction did we block? Compare to plain recall: **24.3%**.
+
+> **The most important line in this README.** We catch a quarter of fraud
+> *transactions* but two-thirds of fraud *money* — because the model
+> preferentially catches the big ones. A count-based metric would have called
+> this model mediocre. Thieves steal dollars, not row counts, so value recall
+> is what the loss line actually responds to.
+
+**Estimated net loss reduction** — dollars saved, minus the cost of false
+declines and analyst review time. Built from three explicit business inputs in
+`evaluation.py` (recovery rate, review cost, false-decline cost) so the
+assumptions are arguable rather than buried.
+
+---
+
+### Model terms
+
+| Term | What it is | Why it's here |
+|---|---|---|
+| **Supervised** | learns from examples labelled fraud / not-fraud | LightGBM. Accurate, but only for fraud patterns already labelled |
+| **Unsupervised** | learns what *normal* looks like; no labels | Isolation Forest + transformer. Labels lag an attack by 30–90 days, so these cover the gap |
+| **Gradient boosting / LightGBM** | builds hundreds of small decision trees, each fixing the previous ones' mistakes | the standard winner on tabular data; fast and explainable |
+| **Isolation Forest** | randomly splits the data; points that get isolated in few splits are odd | flags "unlike anything normal" without ever seeing fraud |
+| **Transformer / sequence model** | reads a *sequence* and predicts what comes next | judges a transaction against **this card's rhythm** — the other two see one transaction at a time |
+| **Ensemble** | combining several models' outputs | each covers the others' blind spots |
+| **Stacking** | *learning* the combination with another model | deliberately **not** used — it would train on the same labels, inheriting the exact blind spot the unsupervised models exist to cover |
+| **Class imbalance** | one class is far rarer than the other | 0.84% vs 99.16% — the central difficulty |
+| **`scale_pos_weight`** | tell the model to treat each fraud as if it were ~118 rows | chosen over SMOTE-style oversampling, which invents cardholder behaviour that never happened |
+| **Calibration** | making "0.9" actually mean "90% of these are fraud" | raw scores are ranked correctly but numerically wrong; without this, thresholds are arbitrary |
+| **Isotonic regression** | calibration that only assumes "higher score = higher risk" | the mis-calibration here isn't S-shaped, so the more flexible method fits |
+| **Log-odds / logit** | `log(p / (1-p))` — probability stretched onto an infinite scale | 0.001 → 0.002 is a *doubling* but looks like nothing on a 0–1 scale; log-odds makes evidence additive. See the blending section below |
+| **Early stopping** | stop training when validation stops improving | prevents memorising the training set |
+| **Chronological split** | train on January–October, test on November–December | a **random** split lets the model see a card's future transactions while predicting its past — metrics look great and production fails |
+| **Leakage** | information at training time that won't exist at prediction time | the single easiest way to ship a broken fraud model |
+| **Target encoding + shrinkage** | replace "merchant #4471" with its historical fraud rate, pulled toward the average when data is thin | one merchant, one chargeback shouldn't mean "100% fraud risk" |
+| **Cold start** | a card/merchant with no history yet | scored **neutral**, never anomalous — otherwise every new customer is punished for being new |
+
+### Serving terms
+
+| Term | What it is | Why it's here |
+|---|---|---|
+| **p50 / p95 / p99** | the middle / 95th-worst / 99th-worst request out of 100 | averages hide the tail. p99 = 3.91 ms means 1 in 100 authorizations is slower than that — that's the one that times out |
+| **Latency budget** | the time allowed before the card network gives up | ~50 ms for our slice; drives nearly every design choice |
+| **ONNX** | a portable file format for a trained model | run the model as a fixed computation graph instead of through Python — same maths, far less per-call overhead |
+| **Quantization / int8** | store weights as 8-bit integers instead of 32-bit decimals | 4× smaller, slightly faster; applied only to the transformer, since it changes tree split thresholds without helping |
+| **Feature store** | database of pre-computed model inputs | "how many times has this card been used in the last hour?" must be *read* in milliseconds, not calculated |
+| **Online vs offline store** | fast key-value lookup (Redis) vs historical archive (S3) | serving reads online; training reads offline; both must agree |
+| **Train/serve skew** | features computed differently in training vs production | the most expensive bug class here — one shared implementation, asserted by test |
+| **Velocity features** | counts and sums over recent time windows | "6 transactions in 10 minutes" is the card-testing signature |
+| **SHAP** | splits a score into per-feature contributions that sum back to it | *why* a transaction was declined — required for adverse-action notices |
+| **LIME** | fits a simple model near one prediction to see what would flip it | analyst-facing second opinion; too slow for the live path |
+
+### Governance terms
+
+| Term | What it is | Why it's here |
+|---|---|---|
+| **Drift** | the world changes and the model silently goes stale | fraud drifts fastest of all — attackers *adapt on purpose* |
+| **PSI** (Population Stability Index) | a number for "how much did this distribution move?" | <0.10 stable, 0.10–0.25 watch, >0.25 investigate — thresholds risk teams already know |
+| **Adverse action** | a decision against a customer, e.g. a decline | legally must come with a recorded reason — why declines always get SHAP codes |
+| **Adverse impact ratio / four-fifths rule** | lowest group's decline rate ÷ highest group's | below 0.8 is the conventional disparate-impact red flag |
+| **Equal opportunity / TPR gap** | is *recall* similar across customer groups? | a gap means some groups get **less fraud protection** |
+| **Champion / challenger** | the model in production vs the candidate | a new model must *beat* the incumbent, not merely pass thresholds |
+| **Audit trail** | tamper-evident record of every decision | "why did you block this in March?" must be answerable years later |
 
 ---
 
