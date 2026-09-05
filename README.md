@@ -384,6 +384,56 @@ magstripe) run *after* the model and can only raise the action. A rule that
 could soften a model decline would be an unreviewable bypass of the model's
 authority.
 
+### Three separate limits, not one
+
+Calling a hosted embedding API to index 50,000 cases has to respect three
+*different* constraints, and conflating them is the usual bug
+([`genai/concurrency.py`](src/fraudplat/genai/concurrency.py)):
+
+| Constraint | Question | Mechanism |
+|---|---|---|
+| **Concurrency** | how many in flight? | `Semaphore` |
+| **Rate** | how many started per second? | `TokenBucket` |
+| **Failure** | what happens when one is rejected? | retry + backoff |
+
+A semaphore alone does not bound rate — 8 workers at 10 ms each is 800 req/s.
+A rate limiter alone does not bound concurrency — 500 slow requests can all be
+open at once and exhaust sockets.
+
+Two decisions inside that:
+
+**A 429 pauses the shared limiter, not just the caller.** The obvious retry
+sleeps the one coroutine that was rejected while the other fifteen keep
+hammering the endpoint — which is how a soft throttle becomes a hard ban.
+`Retry-After` here pauses the bucket every worker draws from.
+
+**Backoff uses full jitter.** `uniform(0, cap)`, not `cap`. Without it, N
+workers that fail on the same upstream blip retry in lockstep and rebuild the
+burst that caused the failure.
+
+There's also a **shared retry budget** across the whole run. Per-call limits
+aren't enough: 5,000 items × 5 attempts against a provider that is simply
+*down* is 25,000 doomed requests. The budget makes the batch give up quickly —
+the cheap half of a circuit breaker.
+
+### Testing time without spending it
+
+Every concurrency test runs under an injected `FakeClock`, so minutes of
+backoff are asserted in milliseconds and deterministically. Retry code tested
+against the real clock is either slow or — more often — not really tested, the
+assertions get weakened until the suite is fast, and by then they no longer
+check the timing that was the point.
+
+It earned its keep immediately. The token bucket had a **livelock**: sleeping
+exactly `deficit / rate` should refill exactly `deficit` tokens, but that
+arithmetic doesn't round-trip in binary floating point, so the balance landed a
+few ulps short. An exact `>=` then computed a deficit of ~1e-17, slept ~2e-18 —
+below clock resolution, so `now + delay == now` — and re-queued forever.
+
+Under a real clock that only burns CPU, so it would have shipped. Under virtual
+time it deadlocked outright and had to be fixed. Both the fix and a regression
+test are in `test_bucket_does_not_spin_on_floating_point_dust`.
+
 ### Retrieved documents are fenced, not trusted
 
 The investigation assistant reads merchant descriptors and device strings —
@@ -465,15 +515,14 @@ feature/score drift (PSI).
 ### GenAI assistant
 
 Needs `pip install -e ".[genai]"` and `ANTHROPIC_API_KEY`. Without them the
-assistant degrades to retrieval-only rather than failing — retrieved case IDs
-are still useful to an analyst.
+assistant degrades to retrieval-only rather than failing — retrieved case IDs are still useful to an analyst.
 
 ---
 
 ## Testing
 
 ```bash
-make test    # 91 tests
+make test    # 127 tests
 make lint
 ```
 
@@ -482,6 +531,14 @@ regressions as models legitimately change: batch/stream parity, causality of
 sequence windows, monotonicity and boundedness of the blend, rule escalation
 ordering, injection detection, PSI behaviour on skewed and constant features,
 and audit-chain tamper detection.
+
+Concurrency is tested under virtual time (`tests/test_concurrency.py`): burst
+and throttle behaviour of the rate limiter, that a 429 backs off the whole
+pool, exponential backoff with jitter, `Retry-After` honoured and capped,
+permanent errors not retried, the shared retry budget cutting a doomed run
+short, bounded fan-out preserving input order, and partial-failure reporting.
+A 60-second per-test timeout is configured so a concurrency regression fails
+CI instead of hanging it.
 
 ---
 

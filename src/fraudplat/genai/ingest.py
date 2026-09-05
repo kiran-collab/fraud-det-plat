@@ -115,3 +115,38 @@ def ingest(index, docs: Iterable[CaseDocument], batch_size: int = 500) -> int:
     for i in range(0, len(docs), batch_size):
         total += index.upsert(docs[i:i + batch_size])
     return total
+
+
+async def embed_documents_async(
+    docs: Iterable[CaseDocument],
+    embed_fn,
+    dim: int,
+    requests_per_second: float = 10.0,
+    max_concurrency: int = 8,
+    batch_size: int = 64,
+    allow_partial: bool = True,
+):
+    """Embed case documents through a rate-limited, retrying async client.
+
+    The local ``HashingEmbedding`` needs none of this - it is pure CPU and the
+    synchronous path is correct for it. This exists for a *hosted* embedding
+    API, where a 50,000-case backfill is 780 network calls against a provider
+    that enforces limits and returns the occasional 429 or 503.
+
+    ``allow_partial`` defaults to True because a backfill that indexes 49,900
+    of 50,000 cases and names the ones it missed is usually more useful than
+    one that discards six hours of work over a single failed batch.
+    """
+    from fraudplat.genai.embedding_client import AsyncEmbeddingClient
+
+    docs = list(docs)
+    client = AsyncEmbeddingClient(
+        embed_fn=embed_fn,
+        dim=dim,
+        requests_per_second=requests_per_second,
+        max_concurrency=max_concurrency,
+        batch_size=batch_size,
+    )
+    vectors, report = await client.embed([d.text for d in docs], allow_partial=allow_partial)
+    log.info("embedded %s case documents: %s", len(docs), report.summary())
+    return docs, vectors, report
