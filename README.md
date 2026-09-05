@@ -434,6 +434,22 @@ Under a real clock that only burns CPU, so it would have shipped. Under virtual
 time it deadlocked outright and had to be fixed. Both the fix and a regression
 test are in `test_bucket_does_not_spin_on_floating_point_dust`.
 
+### Adverse actions get adverse reasons only
+
+Reason codes are ranked by the *magnitude* of each SHAP contribution, because a
+strongly exculpatory feature genuinely is a top driver of the score. But the
+wording has to follow the *sign*: a negative contribution lowered the risk.
+
+An earlier version printed the same adverse phrase either way, so
+`card_seconds_since_last` at `-0.450` rendered as "unusually short gap since
+the previous transaction" when the gap was in fact normal and had *lowered* the
+score. On an approval that is confusing; on a decline it is wrong in a
+compliance-relevant way, because the notice cites as a reason for the decline a
+factor that argued against it.
+
+Declines now pass `adverse_only=True`, so an adverse-action notice lists only
+what caused the adverse action. The analyst view keeps both directions.
+
 ### Retrieved documents are fenced, not trusted
 
 The investigation assistant reads merchant descriptors and device strings —
@@ -522,7 +538,7 @@ assistant degrades to retrieval-only rather than failing — retrieved case IDs 
 ## Testing
 
 ```bash
-make test    # 127 tests
+make test    # 152 tests
 make lint
 ```
 

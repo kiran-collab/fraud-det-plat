@@ -56,7 +56,7 @@ def main() -> int:
     x_train = compute_batch(train_df, engine=engine).to_numpy(dtype=np.float32)
     # Skip the validation window's features but keep its state, so the test
     # window sees the card history it would have in production.
-    _ = compute_batch(df.iloc[len(train_df):len(df) - len(test_df)], engine=engine)
+    _ = compute_batch(df.iloc[len(train_df) : len(df) - len(test_df)], engine=engine)
     x_test = compute_batch(test_df, engine=engine).to_numpy(dtype=np.float32)
 
     def blended(x: np.ndarray, cards: np.ndarray) -> np.ndarray:
@@ -72,9 +72,7 @@ def main() -> int:
     print(f"model version: {bundle.version}\n")
 
     # --- 1. performance --------------------------------------------------
-    perf = evaluate(
-        test_df["is_fraud"].to_numpy(), s_test, test_df["amount"].to_numpy()
-    )
+    perf = evaluate(test_df["is_fraud"].to_numpy(), s_test, test_df["amount"].to_numpy())
     print(format_report(perf, "Held-out performance"))
 
     # --- 2. explainability -----------------------------------------------
@@ -87,7 +85,8 @@ def main() -> int:
 
     # --- 3. fairness ------------------------------------------------------
     bias = evaluate_bias(
-        test_df, s_test,
+        test_df,
+        s_test,
         attribute="customer_age_band",
         threshold=SETTINGS.decision.decline_at,
     )
@@ -99,14 +98,20 @@ def main() -> int:
 
     # --- 5. write the pack -------------------------------------------------
     out = SETTINGS.paths.reports / f"governance_{bundle.version}.json"
-    out.write_text(json.dumps({
-        "model_version": bundle.version,
-        "manifest": bundle.manifest,
-        "performance": perf.to_dict(),
-        "global_shap": shap_global,
-        "fairness": bias.to_dict(),
-        "drift": drift.to_dict(),
-    }, indent=2, default=str))
+    out.write_text(
+        json.dumps(
+            {
+                "model_version": bundle.version,
+                "manifest": bundle.manifest,
+                "performance": perf.to_dict(),
+                "global_shap": shap_global,
+                "fairness": bias.to_dict(),
+                "drift": drift.to_dict(),
+            },
+            indent=2,
+            default=str,
+        )
+    )
     print(f"\ngovernance pack -> {out}")
 
     findings = (not bias.passed) or (not drift.passed)

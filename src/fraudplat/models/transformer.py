@@ -74,9 +74,9 @@ def build_sequence_index(card_ids: np.ndarray, seq_len: int = SEQ_LEN) -> np.nda
     history: dict[str, list[int]] = {}
     for i, card in enumerate(card_ids):
         hist = history.setdefault(card, [])
-        window = hist[-(seq_len - 1):]
+        window = hist[-(seq_len - 1) :]
         if window:
-            index[i, seq_len - 1 - len(window):seq_len - 1] = window
+            index[i, seq_len - 1 - len(window) : seq_len - 1] = window
         index[i, seq_len - 1] = i
         hist.append(i)
     return index
@@ -182,7 +182,8 @@ class SequenceAnomalyModel:
         )
         opt = torch.optim.AdamW(net.parameters(), lr=self.lr, weight_decay=1e-4)
         sched = torch.optim.lr_scheduler.OneCycleLR(
-            opt, max_lr=self.lr,
+            opt,
+            max_lr=self.lr,
             total_steps=max(1, self.epochs * (len(train_rows) // self.batch_size + 1)),
         )
         loss_fn = nn.SmoothL1Loss()  # robust to the heavy tail in amount features
@@ -192,7 +193,7 @@ class SequenceAnomalyModel:
         for _ in range(self.epochs):
             order = rng.permutation(train_rows)
             for start in range(0, len(order), self.batch_size):
-                rows = order[start:start + self.batch_size]
+                rows = order[start : start + self.batch_size]
                 seq = self._gather(x_std, index[rows])
                 target = torch.from_numpy(seq[:, -1, SEQ_TARGET_IDX].copy())
                 seq[:, -1, :] = 0.0  # mask the position being predicted
@@ -215,19 +216,21 @@ class SequenceAnomalyModel:
         return self
 
     # -- scoring ---------------------------------------------------------
-    def _raw_error(self, x_std: np.ndarray, index: np.ndarray, rows: np.ndarray | None = None) -> np.ndarray:
+    def _raw_error(
+        self, x_std: np.ndarray, index: np.ndarray, rows: np.ndarray | None = None
+    ) -> np.ndarray:
         import torch
 
         rows = np.arange(len(x_std)) if rows is None else rows
         out = np.zeros(len(rows), dtype=np.float64)
         with torch.no_grad():
             for start in range(0, len(rows), 4096):
-                chunk = rows[start:start + 4096]
+                chunk = rows[start : start + 4096]
                 seq = self._gather(x_std, index[chunk])
                 target = seq[:, -1, SEQ_TARGET_IDX].copy()
                 seq[:, -1, :] = 0.0
                 pred = self.net(torch.from_numpy(seq)).numpy()
-                out[start:start + len(chunk)] = np.mean((pred - target) ** 2, axis=1)
+                out[start : start + len(chunk)] = np.mean((pred - target) ** 2, axis=1)
         return out
 
     def score(self, x: np.ndarray, card_ids: np.ndarray) -> np.ndarray:
@@ -271,12 +274,21 @@ class SequenceAnomalyModel:
 
         path.parent.mkdir(parents=True, exist_ok=True)
         torch.save(self.net.state_dict(), path)
-        path.with_suffix(".meta.json").write_text(json.dumps({
-            "seq_len": self.seq_len, "d_model": self.d_model, "nhead": self.nhead,
-            "nlayers": self.nlayers, "d_in": self.d_in,
-            "mean": self.mean_.tolist(), "std": self.std_.tolist(),
-            "lo": self._lo, "hi": self._hi,
-        }))
+        path.with_suffix(".meta.json").write_text(
+            json.dumps(
+                {
+                    "seq_len": self.seq_len,
+                    "d_model": self.d_model,
+                    "nhead": self.nhead,
+                    "nlayers": self.nlayers,
+                    "d_in": self.d_in,
+                    "mean": self.mean_.tolist(),
+                    "std": self.std_.tolist(),
+                    "lo": self._lo,
+                    "hi": self._hi,
+                }
+            )
+        )
 
     @classmethod
     def load(cls, path: Path) -> SequenceAnomalyModel:
@@ -284,8 +296,10 @@ class SequenceAnomalyModel:
 
         meta = json.loads(path.with_suffix(".meta.json").read_text())
         obj = cls(
-            seq_len=meta["seq_len"], d_model=meta["d_model"],
-            nhead=meta["nhead"], nlayers=meta["nlayers"],
+            seq_len=meta["seq_len"],
+            d_model=meta["d_model"],
+            nhead=meta["nhead"],
+            nlayers=meta["nlayers"],
         )
         obj.d_in = meta["d_in"]
         obj.mean_ = np.array(meta["mean"])

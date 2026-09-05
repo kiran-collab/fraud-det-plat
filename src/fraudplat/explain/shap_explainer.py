@@ -61,7 +61,9 @@ class ShapExplainer:
         values = np.asarray(values).reshape(-1)[: len(self.feature_names)]
         return {name: float(v) for name, v in zip(self.feature_names, values, strict=False)}
 
-    def global_importance(self, x: np.ndarray, sample: int = 5000, seed: int = 17) -> dict[str, float]:
+    def global_importance(
+        self, x: np.ndarray, sample: int = 5000, seed: int = 17
+    ) -> dict[str, float]:
         """Mean |SHAP| over a sample - the governance-pack view."""
         x = np.asarray(x, dtype=np.float64)
         if len(x) > sample:

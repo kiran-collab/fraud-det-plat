@@ -57,7 +57,7 @@ def test_drift_report_flags_and_ranks(rng):
     current = baseline.copy()
     current[:, 1] += 3.0  # only 'b' drifts
     report = detect_drift(baseline, current, names)
-    assert report.features[0].feature == "b"      # sorted by PSI descending
+    assert report.features[0].feature == "b"  # sorted by PSI descending
     assert report.features[0].status == "investigate"
     assert not report.passed
     assert any("b" in f for f in report.flagged)
@@ -89,10 +89,12 @@ def test_bias_monitor_detects_a_segment_declined_far_more_often(rng):
 
 
 def test_small_segments_are_marked_unreliable(rng):
-    df = pd.DataFrame({
-        "customer_age_band": ["big"] * 900 + ["tiny"] * 5,
-        "is_fraud": [0] * 905,
-    })
+    df = pd.DataFrame(
+        {
+            "customer_age_band": ["big"] * 900 + ["tiny"] * 5,
+            "is_fraud": [0] * 905,
+        }
+    )
     report = evaluate_bias(df, np.zeros(905), threshold=0.5)
     tiny = next(s for s in report.segments if s.segment == "tiny")
     assert not tiny.reliable
@@ -101,10 +103,12 @@ def test_small_segments_are_marked_unreliable(rng):
 def test_tpr_is_withheld_when_positives_are_too_few(rng):
     """A TPR computed from three fraud cases is noise and must not be reported
     as a fairness finding."""
-    df = pd.DataFrame({
-        "customer_age_band": ["a"] * 500 + ["b"] * 500,
-        "is_fraud": [1] * 3 + [0] * 497 + [1] * 3 + [0] * 497,
-    })
+    df = pd.DataFrame(
+        {
+            "customer_age_band": ["a"] * 500 + ["b"] * 500,
+            "is_fraud": [1] * 3 + [0] * 497 + [1] * 3 + [0] * 497,
+        }
+    )
     report = evaluate_bias(df, np.zeros(1000), threshold=0.5)
     assert all(s.true_positive_rate is None for s in report.segments)
     assert report.tpr_gap == 0.0

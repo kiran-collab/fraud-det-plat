@@ -57,9 +57,7 @@ class DriftReport:
         return d
 
 
-def population_stability_index(
-    baseline: np.ndarray, current: np.ndarray, bins: int = 10
-) -> float:
+def population_stability_index(baseline: np.ndarray, current: np.ndarray, bins: int = 10) -> float:
     """PSI between two samples, using baseline quantile edges.
 
     Quantile edges from the baseline, not equal-width bins: fraud features are
@@ -111,14 +109,16 @@ def detect_drift(
         psi = population_stability_index(b, c)
         b_mean, c_mean = float(np.mean(b)), float(np.mean(c))
         status = _status(psi)
-        report.features.append(FeatureDrift(
-            feature=name,
-            psi=psi,
-            baseline_mean=b_mean,
-            current_mean=c_mean,
-            mean_shift_pct=100.0 * (c_mean - b_mean) / max(abs(b_mean), 1e-9),
-            status=status,
-        ))
+        report.features.append(
+            FeatureDrift(
+                feature=name,
+                psi=psi,
+                baseline_mean=b_mean,
+                current_mean=c_mean,
+                mean_shift_pct=100.0 * (c_mean - b_mean) / max(abs(b_mean), 1e-9),
+                status=status,
+            )
+        )
         if status == "investigate":
             report.flagged.append(f"{name}: PSI {psi:.3f}")
 

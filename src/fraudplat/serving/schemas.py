@@ -58,3 +58,7 @@ class HealthResponse(BaseModel):
     online_store: dict[str, Any]
     inference_backend: str
     uptime_seconds: float
+    # Surfaced so a service running without authentication, or with a failing
+    # audit sink, is visible rather than silently degraded.
+    auth: dict[str, Any] = {}
+    audit: dict[str, Any] = {}

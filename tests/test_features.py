@@ -91,22 +91,16 @@ def test_velocity_windows_respect_boundaries(engine, sample_txn):
     engine.transform({**sample_txn, "event_time": base}, update=True)
 
     # 30 minutes later: inside the 1h window.
-    f = engine.transform(
-        {**sample_txn, "event_time": "2025-02-01T12:30:00+00:00"}, update=True
-    )
+    f = engine.transform({**sample_txn, "event_time": "2025-02-01T12:30:00+00:00"}, update=True)
     assert f["card_txn_count_1h"] == 1
 
     # 3 hours after the first: outside 1h, still inside 24h.
-    f = engine.transform(
-        {**sample_txn, "event_time": "2025-02-01T15:30:00+00:00"}, update=True
-    )
+    f = engine.transform({**sample_txn, "event_time": "2025-02-01T15:30:00+00:00"}, update=True)
     assert f["card_txn_count_1h"] == 0
     assert f["card_txn_count_24h"] == 2
 
     # 9 days later: everything has aged out of the 7d buffer.
-    f = engine.transform(
-        {**sample_txn, "event_time": "2025-02-10T15:30:00+00:00"}, update=True
-    )
+    f = engine.transform({**sample_txn, "event_time": "2025-02-10T15:30:00+00:00"}, update=True)
     assert f["card_txn_count_7d"] == 0
 
 
@@ -118,10 +112,12 @@ def test_merchant_profile_shrinks_thin_file_merchants():
     # m_busy is genuinely riskier than the portfolio rather than merely being
     # the portfolio (a single dominant merchant *is* the base rate, and its
     # shrunk estimate is then correctly pulled toward itself).
-    df = pd.DataFrame({
-        "merchant_id": ["m_busy"] * 500 + ["m_safe"] * 2000 + ["m_new"],
-        "is_fraud": [1] * 100 + [0] * 400 + [1] * 20 + [0] * 1980 + [1],
-    })
+    df = pd.DataFrame(
+        {
+            "merchant_id": ["m_busy"] * 500 + ["m_safe"] * 2000 + ["m_new"],
+            "is_fraud": [1] * 100 + [0] * 400 + [1] * 20 + [0] * 1980 + [1],
+        }
+    )
     profile = MerchantProfile.fit(df)
     assert profile.base_rate < 0.06
     # One transaction, one chargeback - must not become a 100% risk score.

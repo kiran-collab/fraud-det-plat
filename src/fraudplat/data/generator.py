@@ -21,15 +21,30 @@ import pandas as pd
 from fraudplat.data.schema import RAW_COLUMNS
 
 MCC_POOL = [
-    "grocery", "fuel", "restaurant", "electronics", "travel",
-    "apparel", "digital_goods", "pharmacy", "gambling", "money_transfer",
+    "grocery",
+    "fuel",
+    "restaurant",
+    "electronics",
+    "travel",
+    "apparel",
+    "digital_goods",
+    "pharmacy",
+    "gambling",
+    "money_transfer",
 ]
 # Base fraud propensity by category - gambling / money transfer / digital goods
 # carry more risk, which is what the merchant-risk feature should learn.
 MCC_RISK = {
-    "grocery": 0.2, "fuel": 0.5, "restaurant": 0.3, "electronics": 1.6,
-    "travel": 1.2, "apparel": 0.7, "digital_goods": 2.2, "pharmacy": 0.4,
-    "gambling": 3.0, "money_transfer": 3.4,
+    "grocery": 0.2,
+    "fuel": 0.5,
+    "restaurant": 0.3,
+    "electronics": 1.6,
+    "travel": 1.2,
+    "apparel": 0.7,
+    "digital_goods": 2.2,
+    "pharmacy": 0.4,
+    "gambling": 3.0,
+    "money_transfer": 3.4,
 }
 COUNTRIES = ["US", "CA", "GB", "DE", "FR", "MX", "BR", "IN", "NG", "RO"]
 FOREIGN_WEIGHTS = np.array([0.62, 0.08, 0.06, 0.05, 0.04, 0.05, 0.04, 0.03, 0.02, 0.01])
@@ -38,10 +53,16 @@ FOREIGN_WEIGHTS = np.array([0.62, 0.08, 0.06, 0.05, 0.04, 0.05, 0.04, 0.03, 0.02
 def _amount_for(rng: np.random.Generator, mcc: str, n: int) -> np.ndarray:
     """Log-normal amounts with category-specific location/scale."""
     loc, scale = {
-        "grocery": (3.6, 0.6), "fuel": (3.5, 0.5), "restaurant": (3.3, 0.7),
-        "electronics": (5.2, 0.9), "travel": (5.6, 1.0), "apparel": (4.1, 0.8),
-        "digital_goods": (2.8, 1.1), "pharmacy": (3.2, 0.7),
-        "gambling": (4.4, 1.2), "money_transfer": (5.0, 1.3),
+        "grocery": (3.6, 0.6),
+        "fuel": (3.5, 0.5),
+        "restaurant": (3.3, 0.7),
+        "electronics": (5.2, 0.9),
+        "travel": (5.6, 1.0),
+        "apparel": (4.1, 0.8),
+        "digital_goods": (2.8, 1.1),
+        "pharmacy": (3.2, 0.7),
+        "gambling": (4.4, 1.2),
+        "money_transfer": (5.0, 1.3),
     }[mcc]
     return np.round(rng.lognormal(loc, scale, n), 2).clip(1.0, 25_000.0)
 
@@ -112,30 +133,40 @@ def generate(
 
     # Each card has a home device; a minority of traffic comes from elsewhere.
     card_device = np.array([f"dev_{i:07d}" for i in range(n_cards)])
-    device_id = np.where(rng.random(n) < 0.88, card_device[card_idx],
-                         np.array([f"dev_{i:07d}" for i in rng.integers(0, n_cards * 2, n)]))
-    ip_prefix = np.array([f"{a}.{b}.0.0" for a, b in
-                          zip(rng.integers(1, 224, n), rng.integers(0, 256, n), strict=True)])
+    device_id = np.where(
+        rng.random(n) < 0.88,
+        card_device[card_idx],
+        np.array([f"dev_{i:07d}" for i in rng.integers(0, n_cards * 2, n)]),
+    )
+    ip_prefix = np.array(
+        [
+            f"{a}.{b}.0.0"
+            for a, b in zip(rng.integers(1, 224, n), rng.integers(0, 256, n), strict=True)
+        ]
+    )
 
-    df = pd.DataFrame({
-        "transaction_id": [f"txn_{i:09d}" for i in range(n)],
-        "event_time": ts,
-        "card_id": card_ids[card_idx],
-        "customer_id": np.char.replace(card_ids[card_idx].astype(str), "card_", "cust_"),
-        "merchant_id": merchant_ids[mch_idx],
-        "merchant_category": mcc,
-        "merchant_country": merchant_country[mch_idx],
-        "amount": amount,
-        "currency": "USD",
-        "channel": channel,
-        "entry_mode": entry_mode,
-        "device_id": device_id,
-        "ip_prefix": ip_prefix,
-        "issuer_country": "US",
-        "customer_age_band": rng.choice(["18-25", "26-40", "41-60", "60+"], n,
-                                        p=[0.18, 0.37, 0.31, 0.14]),
-        "is_fraud": 0,
-    })
+    df = pd.DataFrame(
+        {
+            "transaction_id": [f"txn_{i:09d}" for i in range(n)],
+            "event_time": ts,
+            "card_id": card_ids[card_idx],
+            "customer_id": np.char.replace(card_ids[card_idx].astype(str), "card_", "cust_"),
+            "merchant_id": merchant_ids[mch_idx],
+            "merchant_category": mcc,
+            "merchant_country": merchant_country[mch_idx],
+            "amount": amount,
+            "currency": "USD",
+            "channel": channel,
+            "entry_mode": entry_mode,
+            "device_id": device_id,
+            "ip_prefix": ip_prefix,
+            "issuer_country": "US",
+            "customer_age_band": rng.choice(
+                ["18-25", "26-40", "41-60", "60+"], n, p=[0.18, 0.37, 0.31, 0.14]
+            ),
+            "is_fraud": 0,
+        }
+    )
 
     df = df.sort_values("event_time", ignore_index=True)
     _inject_fraud(df, rng, fraud_rate)
@@ -188,7 +219,7 @@ def _inject_fraud(df: pd.DataFrame, rng: np.random.Generator, fraud_rate: float)
         """
         anchor = int(rng.integers(0, len(idx)))
         start = int(np.clip(anchor - k // 2, 0, max(0, len(idx) - k)))
-        return idx[start:start + k], times[idx[anchor]]
+        return idx[start : start + k], times[idx[anchor]]
 
     def compress(hit: np.ndarray, anchor_time, minutes_lo: float, minutes_hi: float) -> None:
         """Pull an episode into a tight window centred on ``anchor_time``."""
@@ -204,7 +235,9 @@ def _inject_fraud(df: pd.DataFrame, rng: np.random.Generator, fraud_rate: float)
     n_bad = max(2, len(merchant_ids) // 60)
     mch_risk = pd.DataFrame({"m": merchant, "r": risk}).groupby("m")["r"].mean()
     bad_merchants = rng.choice(
-        mch_risk.index.to_numpy(), n_bad, replace=False,
+        mch_risk.index.to_numpy(),
+        n_bad,
+        replace=False,
         p=(mch_risk.to_numpy() / mch_risk.to_numpy().sum()),
     )
     compromised = np.isin(merchant, bad_merchants)

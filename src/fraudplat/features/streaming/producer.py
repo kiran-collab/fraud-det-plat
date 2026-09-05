@@ -33,12 +33,14 @@ class TransactionProducer:
             bootstrap_servers=self.kafka.bootstrap_servers.split(","),
             value_serializer=lambda v: json.dumps(v, default=str).encode("utf-8"),
             key_serializer=lambda k: str(k).encode("utf-8"),
-            linger_ms=5,          # small batching window; 5ms is well inside budget
+            linger_ms=5,  # small batching window; 5ms is well inside budget
             compression_type="lz4",
-            acks=1,               # leader ack: durable enough for a replayable feed
+            acks=1,  # leader ack: durable enough for a replayable feed
         )
 
-    def send(self, transactions: Iterable[dict[str, Any]], rate_per_sec: float | None = None) -> int:
+    def send(
+        self, transactions: Iterable[dict[str, Any]], rate_per_sec: float | None = None
+    ) -> int:
         if self._producer is None:
             self._producer = self._connect()
 

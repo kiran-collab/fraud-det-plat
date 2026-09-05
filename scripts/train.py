@@ -81,7 +81,9 @@ def main() -> int:
 
     # --- 2. merchant encoding from the training window only --------------
     profile = MerchantProfile.fit(train_df)
-    log(f"merchant profile: {len(profile.total_counts):,} merchants, base rate {profile.base_rate:.4%}")
+    log(
+        f"merchant profile: {len(profile.total_counts):,} merchants, base rate {profile.base_rate:.4%}"
+    )
 
     # --- 3. one engine, replayed in time order across all splits ---------
     engine = FeatureEngine(profile)

@@ -48,9 +48,7 @@ def case_narrative(txn: dict[str, Any], features: dict[str, float] | None = None
     if features.get("card_txn_count_1h", 0) >= 4:
         signals.append(f"{features['card_txn_count_1h']:.0f} transactions in the preceding hour")
     if features.get("amount_ratio_card_mean", 1) >= 4:
-        signals.append(
-            f"amount {features['amount_ratio_card_mean']:.1f}x the card's average"
-        )
+        signals.append(f"amount {features['amount_ratio_card_mean']:.1f}x the card's average")
     if features.get("merchant_risk_score", 0) > 0.02:
         signals.append("merchant with an elevated historical fraud rate")
     if features.get("is_night"):
@@ -94,17 +92,19 @@ def build_documents(
         txn = df.iloc[i].to_dict()
         feat = features.iloc[i].to_dict() if features is not None else {}
         text, _ = redact(case_narrative(txn, feat))
-        docs.append(CaseDocument(
-            case_id=str(txn["transaction_id"]),
-            text=text,
-            metadata={
-                "disposition": DISPOSITIONS.get(int(txn.get("is_fraud", 0)), "unknown"),
-                "merchant_category": str(txn.get("merchant_category")),
-                "channel": str(txn.get("channel")),
-                "merchant_country": str(txn.get("merchant_country")),
-                "amount": float(txn.get("amount", 0)),
-            },
-        ))
+        docs.append(
+            CaseDocument(
+                case_id=str(txn["transaction_id"]),
+                text=text,
+                metadata={
+                    "disposition": DISPOSITIONS.get(int(txn.get("is_fraud", 0)), "unknown"),
+                    "merchant_category": str(txn.get("merchant_category")),
+                    "channel": str(txn.get("channel")),
+                    "merchant_country": str(txn.get("merchant_country")),
+                    "amount": float(txn.get("amount", 0)),
+                },
+            )
+        )
     log.info("built %s case documents (%s fraud)", len(docs), len(fraud_idx))
     return docs
 
@@ -113,7 +113,7 @@ def ingest(index, docs: Iterable[CaseDocument], batch_size: int = 500) -> int:
     docs = list(docs)
     total = 0
     for i in range(0, len(docs), batch_size):
-        total += index.upsert(docs[i:i + batch_size])
+        total += index.upsert(docs[i : i + batch_size])
     return total
 
 

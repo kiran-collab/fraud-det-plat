@@ -35,17 +35,42 @@ _REDACTIONS: list[tuple[str, re.Pattern[str], str]] = [
     ("cvv", re.compile(r"\bcvv:?\s*\d{3,4}\b", re.I), "[REDACTED_CVV]"),
     ("ssn", re.compile(r"\b\d{3}-\d{2}-\d{4}\b"), "[REDACTED_SSN]"),
     ("email", re.compile(r"\b[\w.+-]+@[\w-]+\.[\w.]+\b"), "[REDACTED_EMAIL]"),
-    ("phone", re.compile(r"\b(?:\+?1[-.\s]?)?\(?\d{3}\)?[-.\s]?\d{3}[-.\s]?\d{4}\b"), "[REDACTED_PHONE]"),
+    (
+        "phone",
+        re.compile(r"\b(?:\+?1[-.\s]?)?\(?\d{3}\)?[-.\s]?\d{3}[-.\s]?\d{4}\b"),
+        "[REDACTED_PHONE]",
+    ),
 ]
 
 # Patterns that suggest someone is trying to steer the model through data.
 _INJECTION_PATTERNS: list[tuple[str, re.Pattern[str]]] = [
-    ("instruction_override", re.compile(r"ignore\s+(?:all\s+)?(?:previous|prior|above)\s+instructions?", re.I)),
-    ("role_switch", re.compile(r"\b(?:you\s+are\s+now|act\s+as|pretend\s+to\s+be|roleplay)\b", re.I)),
-    ("system_prompt_probe", re.compile(r"\b(?:system\s+prompt|your\s+instructions|reveal\s+your)\b", re.I)),
+    (
+        "instruction_override",
+        re.compile(r"ignore\s+(?:all\s+)?(?:previous|prior|above)\s+instructions?", re.I),
+    ),
+    (
+        "role_switch",
+        re.compile(r"\b(?:you\s+are\s+now|act\s+as|pretend\s+to\s+be|roleplay)\b", re.I),
+    ),
+    (
+        "system_prompt_probe",
+        re.compile(r"\b(?:system\s+prompt|your\s+instructions|reveal\s+your)\b", re.I),
+    ),
     ("fake_delimiter", re.compile(r"</?(?:system|assistant|human|instructions?)>", re.I)),
-    ("decision_override", re.compile(r"\b(?:approve|clear|whitelist|unblock)\s+(?:this|the)\s+(?:card|transaction|case)\b", re.I)),
-    ("exfiltration", re.compile(r"\b(?:send|post|email|upload)\s+(?:this|the|all)\b.{0,40}\b(?:to|at)\b\s*\S+@|https?://", re.I)),
+    (
+        "decision_override",
+        re.compile(
+            r"\b(?:approve|clear|whitelist|unblock)\s+(?:this|the)\s+(?:card|transaction|case)\b",
+            re.I,
+        ),
+    ),
+    (
+        "exfiltration",
+        re.compile(
+            r"\b(?:send|post|email|upload)\s+(?:this|the|all)\b.{0,40}\b(?:to|at)\b\s*\S+@|https?://",
+            re.I,
+        ),
+    ),
 ]
 
 

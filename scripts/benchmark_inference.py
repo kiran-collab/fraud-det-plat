@@ -76,9 +76,21 @@ def main() -> int:
     print(f"model {bundle.version}   iterations={args.iterations}   budget={BUDGET_MS}ms (p99)\n")
     print("-- component latency (single transaction, milliseconds) --")
 
-    print(row("LightGBM (python)", time_it(lambda: bundle.supervised.predict_proba(x), args.iterations)))
-    print(row("IsolationForest (python)", time_it(lambda: bundle.iforest.score(x), args.iterations)))
-    print(row("Transformer (pytorch)", time_it(lambda: bundle.sequence.score_window(window), args.iterations)))
+    print(
+        row(
+            "LightGBM (python)",
+            time_it(lambda: bundle.supervised.predict_proba(x), args.iterations),
+        )
+    )
+    print(
+        row("IsolationForest (python)", time_it(lambda: bundle.iforest.score(x), args.iterations))
+    )
+    print(
+        row(
+            "Transformer (pytorch)",
+            time_it(lambda: bundle.sequence.score_window(window), args.iterations),
+        )
+    )
 
     onnx_dir = Path(registry.version_dir(bundle.version)) / "onnx"
     if (onnx_dir / "supervised.onnx").exists():
@@ -86,20 +98,36 @@ def main() -> int:
 
         fp32 = OnnxScorer(onnx_dir / "supervised.onnx", onnx_dir / "sequence.onnx")
         print(row("LightGBM (onnx)", time_it(lambda: fp32.predict_proba(x), args.iterations)))
-        print(row("Transformer (onnx fp32)", time_it(lambda: fp32.sequence_forward(window), args.iterations)))
+        print(
+            row(
+                "Transformer (onnx fp32)",
+                time_it(lambda: fp32.sequence_forward(window), args.iterations),
+            )
+        )
 
         if (onnx_dir / "sequence.int8.onnx").exists():
             int8 = OnnxScorer(onnx_dir / "supervised.onnx", onnx_dir / "sequence.int8.onnx")
-            print(row("Transformer (onnx int8)", time_it(lambda: int8.sequence_forward(window), args.iterations)))
+            print(
+                row(
+                    "Transformer (onnx int8)",
+                    time_it(lambda: int8.sequence_forward(window), args.iterations),
+                )
+            )
     else:
         print("  (no ONNX build found - run scripts/export_onnx.py)")
 
     # --- end to end -----------------------------------------------------
     print("\n-- end-to-end /score (features + 3 models + blend + rules + store) --")
     txn = {
-        "transaction_id": "bench", "card_id": "card_0000007", "merchant_id": "mch_000010",
-        "merchant_category": "electronics", "merchant_country": "US", "amount": 240.0,
-        "channel": "ecom", "entry_mode": "keyed", "device_id": "dev_0000007",
+        "transaction_id": "bench",
+        "card_id": "card_0000007",
+        "merchant_id": "mch_000010",
+        "merchant_category": "electronics",
+        "merchant_country": "US",
+        "amount": 240.0,
+        "channel": "ecom",
+        "entry_mode": "keyed",
+        "device_id": "dev_0000007",
         "issuer_country": "US",
     }
     n = min(args.iterations, 500)  # end-to-end is the slow one; keep runtime sane

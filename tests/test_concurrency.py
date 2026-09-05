@@ -43,6 +43,7 @@ def simulate(coro_fn):
     while pumping another one deadlocks - which is why FakeClock now detects
     that state and raises instead of hanging.
     """
+
     async def outer():
         clock = FakeClock()
         return await clock.run(coro_fn(clock))
@@ -135,7 +136,7 @@ def test_bucket_refills_over_time():
         bucket = TokenBucket(rate_per_sec=10, capacity=10, clock=clock)
         for _ in range(10):
             await bucket.acquire()
-        await clock.sleep(1.0)          # refills 10 tokens
+        await clock.sleep(1.0)  # refills 10 tokens
         before = clock.now()
         for _ in range(10):
             await bucket.acquire()
@@ -153,7 +154,7 @@ def test_pause_backs_off_every_worker_not_just_the_rejected_one():
 
     async def main(clock):
         bucket = TokenBucket(rate_per_sec=100, capacity=100, clock=clock)
-        bucket.pause(2.0)               # as if one worker saw Retry-After: 2
+        bucket.pause(2.0)  # as if one worker saw Retry-After: 2
         start = clock.now()
         # A different worker, with plenty of tokens available, still waits.
         await bucket.acquire()
@@ -438,8 +439,12 @@ def test_client_embeds_everything_in_input_order():
     async def main(clock):
         provider = FakeProvider(clock, dim=4)
         client = AsyncEmbeddingClient(
-            provider.embed, dim=4, requests_per_second=1000,
-            max_concurrency=4, batch_size=10, clock=clock,
+            provider.embed,
+            dim=4,
+            requests_per_second=1000,
+            max_concurrency=4,
+            batch_size=10,
+            clock=clock,
         )
         texts = [f"case-{i}" for i in range(95)]
         return await client.embed(texts)
@@ -455,8 +460,13 @@ def test_client_respects_the_rate_limit():
     async def main(clock):
         provider = FakeProvider(clock)
         client = AsyncEmbeddingClient(
-            provider.embed, dim=4, requests_per_second=5, burst_capacity=5,
-            max_concurrency=10, batch_size=1, clock=clock,
+            provider.embed,
+            dim=4,
+            requests_per_second=5,
+            burst_capacity=5,
+            max_concurrency=10,
+            batch_size=1,
+            clock=clock,
         )
         await client.embed([f"case-{i}" for i in range(20)])
         return clock.now()
@@ -470,8 +480,12 @@ def test_client_caps_concurrency_end_to_end():
     async def main(clock):
         provider = FakeProvider(clock, latency=0.2)
         client = AsyncEmbeddingClient(
-            provider.embed, dim=4, requests_per_second=10_000,
-            max_concurrency=3, batch_size=1, clock=clock,
+            provider.embed,
+            dim=4,
+            requests_per_second=10_000,
+            max_concurrency=3,
+            batch_size=1,
+            clock=clock,
         )
         await client.embed([f"case-{i}" for i in range(30)])
         return provider.max_concurrent
@@ -483,8 +497,12 @@ def test_client_recovers_from_transient_failures():
     async def main(clock):
         provider = FakeProvider(clock, fail_times=3)
         client = AsyncEmbeddingClient(
-            provider.embed, dim=4, requests_per_second=1000, batch_size=5,
-            retry=RetryPolicy(base_delay=0.1, jitter=False), clock=clock,
+            provider.embed,
+            dim=4,
+            requests_per_second=1000,
+            batch_size=5,
+            retry=RetryPolicy(base_delay=0.1, jitter=False),
+            clock=clock,
         )
         return await client.embed([f"case-{i}" for i in range(20)])
 
@@ -501,7 +519,10 @@ def test_partial_failure_is_reported_not_hidden():
     async def main(clock):
         provider = FakeProvider(clock, fail_batches={"case-10"})
         client = AsyncEmbeddingClient(
-            provider.embed, dim=4, requests_per_second=1000, batch_size=5,
+            provider.embed,
+            dim=4,
+            requests_per_second=1000,
+            batch_size=5,
             retry=RetryPolicy(max_attempts=2, base_delay=0.01, jitter=False),
             clock=clock,
         )
@@ -509,9 +530,9 @@ def test_partial_failure_is_reported_not_hidden():
 
     vectors, report = simulate(main)
     assert not report.ok
-    assert report.failed_batches == [2]          # texts 10-14
+    assert report.failed_batches == [2]  # texts 10-14
     assert report.succeeded == 4
-    assert np.all(vectors[10:15] == 0.0)         # failed rows left as zeros
+    assert np.all(vectors[10:15] == 0.0)  # failed rows left as zeros
     np.testing.assert_allclose(vectors[:10, 0], np.arange(10, dtype=np.float32))
 
 
@@ -519,7 +540,10 @@ def test_strict_mode_raises_on_batch_failure():
     async def main(clock):
         provider = FakeProvider(clock, fail_batches={"case-0"})
         client = AsyncEmbeddingClient(
-            provider.embed, dim=4, requests_per_second=1000, batch_size=5,
+            provider.embed,
+            dim=4,
+            requests_per_second=1000,
+            batch_size=5,
             retry=RetryPolicy(max_attempts=2, base_delay=0.01, jitter=False),
             clock=clock,
         )
@@ -538,8 +562,12 @@ def test_provider_returning_wrong_vector_count_is_rejected():
             return [[1.0] * 4 for _ in texts[:-1]]  # one short
 
         client = AsyncEmbeddingClient(
-            bad_embed, dim=4, requests_per_second=1000, batch_size=5,
-            retry=RetryPolicy(max_attempts=1), clock=clock,
+            bad_embed,
+            dim=4,
+            requests_per_second=1000,
+            batch_size=5,
+            retry=RetryPolicy(max_attempts=1),
+            clock=clock,
         )
         with pytest.raises(ValueError, match="expected 5 vectors, got 4"):
             await client.embed([f"case-{i}" for i in range(5)])
@@ -549,9 +577,7 @@ def test_provider_returning_wrong_vector_count_is_rejected():
 
 def test_empty_input_is_a_no_op():
     async def main():
-        client = AsyncEmbeddingClient(
-            FakeProvider(FakeClock()).embed, dim=4, clock=FakeClock()
-        )
+        client = AsyncEmbeddingClient(FakeProvider(FakeClock()).embed, dim=4, clock=FakeClock())
         return await client.embed([])
 
     vectors, report = run(main())

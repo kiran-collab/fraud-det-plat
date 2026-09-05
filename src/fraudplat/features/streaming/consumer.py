@@ -84,7 +84,9 @@ class FeatureStreamWriter:
         return features
 
     # -- loop ------------------------------------------------------------
-    def run(self, messages: Iterator[dict[str, Any]] | None = None, log_every: int = 10_000) -> ConsumerStats:
+    def run(
+        self, messages: Iterator[dict[str, Any]] | None = None, log_every: int = 10_000
+    ) -> ConsumerStats:
         """Consume until interrupted.
 
         ``messages`` lets tests and the local demo drive the same code path with

@@ -141,7 +141,9 @@ def quantize(src: Path, dst: Path) -> ExportResult:
     return ExportResult(dst, dst.stat().st_size, float("nan"), note="int8 dynamic")
 
 
-def _compare(model_path: Path, feeds: dict[str, np.ndarray], expected: np.ndarray, output_index: int = 0) -> float:
+def _compare(
+    model_path: Path, feeds: dict[str, np.ndarray], expected: np.ndarray, output_index: int = 0
+) -> float:
     """Numerical parity check. An export that silently changes scores is worse
     than no export at all, so this runs on every conversion."""
     import onnxruntime as ort

@@ -65,7 +65,7 @@ class HashingEmbedding:
         if not text:
             return v
         for i in range(max(1, len(text) - self.ngram + 1)):
-            gram = text[i:i + self.ngram]
+            gram = text[i : i + self.ngram]
             # Signed hashing keeps the projection roughly unbiased.
             h = hash(gram)
             v[abs(h) % self.dim] += 1.0 if h >= 0 else -1.0
@@ -73,7 +73,11 @@ class HashingEmbedding:
         return v / norm if norm > 0 else v
 
     def encode(self, texts: list[str]) -> np.ndarray:
-        return np.vstack([self._vec(t) for t in texts]) if texts else np.zeros((0, self.dim), np.float32)
+        return (
+            np.vstack([self._vec(t) for t in texts])
+            if texts
+            else np.zeros((0, self.dim), np.float32)
+        )
 
 
 class LocalVectorIndex:
@@ -100,14 +104,13 @@ class LocalVectorIndex:
             self._vectors = np.load(vec_file)
             self._docs = [
                 CaseDocument(**json.loads(line))
-                for line in doc_file.read_text().splitlines() if line.strip()
+                for line in doc_file.read_text().splitlines()
+                if line.strip()
             ]
 
     def _persist(self) -> None:
         np.save(self.path / "vectors.npy", self._vectors)
-        (self.path / "docs.jsonl").write_text(
-            "\n".join(json.dumps(d.__dict__) for d in self._docs)
-        )
+        (self.path / "docs.jsonl").write_text("\n".join(json.dumps(d.__dict__) for d in self._docs))
 
     def upsert(self, docs: list[CaseDocument]) -> int:
         if not docs:
@@ -123,7 +126,9 @@ class LocalVectorIndex:
         self._persist()
         return len(docs)
 
-    def search(self, query: str, top_k: int = 6, filters: dict[str, Any] | None = None) -> list[RetrievedCase]:
+    def search(
+        self, query: str, top_k: int = 6, filters: dict[str, Any] | None = None
+    ) -> list[RetrievedCase]:
         if not self._docs:
             return []
         q = self.embedding.encode([query])[0]
@@ -134,9 +139,7 @@ class LocalVectorIndex:
             doc = self._docs[int(i)]
             if filters and any(doc.metadata.get(k) != v for k, v in filters.items()):
                 continue
-            results.append(
-                RetrievedCase(doc.case_id, doc.text, float(sims[int(i)]), doc.metadata)
-            )
+            results.append(RetrievedCase(doc.case_id, doc.text, float(sims[int(i)]), doc.metadata))
             if len(results) >= top_k:
                 break
         return results
@@ -145,7 +148,9 @@ class LocalVectorIndex:
 class PineconeVectorIndex:
     """Pinecone-backed index for production volumes."""
 
-    def __init__(self, index_name: str | None = None, embedding: EmbeddingModel | None = None) -> None:
+    def __init__(
+        self, index_name: str | None = None, embedding: EmbeddingModel | None = None
+    ) -> None:
         from pinecone import Pinecone
 
         self.embedding = embedding or HashingEmbedding(SETTINGS.genai.embedding_dim)
@@ -170,10 +175,12 @@ class PineconeVectorIndex:
             for d, vec in zip(docs, vectors, strict=True)
         ]
         for i in range(0, len(payload), batch_size):
-            self._index.upsert(vectors=payload[i:i + batch_size])
+            self._index.upsert(vectors=payload[i : i + batch_size])
         return len(payload)
 
-    def search(self, query: str, top_k: int = 6, filters: dict[str, Any] | None = None) -> list[RetrievedCase]:
+    def search(
+        self, query: str, top_k: int = 6, filters: dict[str, Any] | None = None
+    ) -> list[RetrievedCase]:
         q = self.embedding.encode([query])[0].tolist()
         res = self._index.query(
             vector=q, top_k=top_k, include_metadata=True, filter=filters or None

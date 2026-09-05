@@ -42,9 +42,16 @@ SEQ_WINDOW = 8
 MERCHANT_PRIOR_WEIGHT = 50.0
 
 MCC_RISK_PRIOR = {
-    "grocery": 0.2, "fuel": 0.5, "restaurant": 0.3, "electronics": 1.6,
-    "travel": 1.2, "apparel": 0.7, "digital_goods": 2.2, "pharmacy": 0.4,
-    "gambling": 3.0, "money_transfer": 3.4,
+    "grocery": 0.2,
+    "fuel": 0.5,
+    "restaurant": 0.3,
+    "electronics": 1.6,
+    "travel": 1.2,
+    "apparel": 0.7,
+    "digital_goods": 2.2,
+    "pharmacy": 0.4,
+    "gambling": 3.0,
+    "money_transfer": 3.4,
 }
 
 FEATURE_NAMES: list[str] = [
@@ -186,9 +193,7 @@ class _CardState:
     def load(cls, d: Mapping[str, Any]) -> _CardState:
         return cls(
             events=deque(tuple(e) for e in d.get("events", [])),
-            recent_vectors=deque(
-                (list(v) for v in d.get("recent_vectors", [])), maxlen=SEQ_WINDOW
-            ),
+            recent_vectors=deque((list(v) for v in d.get("recent_vectors", [])), maxlen=SEQ_WINDOW),
             n_seen=int(d.get("n_seen", 0)),
             amount_sum=float(d.get("amount_sum", 0.0)),
             amount_sq_sum=float(d.get("amount_sq_sum", 0.0)),
@@ -249,9 +254,9 @@ class FeatureEngine:
         if st is None or not st.recent_vectors:
             return None
         window = np.zeros((seq_len, len(FEATURE_NAMES)), dtype=np.float32)
-        recent = list(st.recent_vectors)[-(seq_len - 1):]
+        recent = list(st.recent_vectors)[-(seq_len - 1) :]
         if recent:
-            window[seq_len - 1 - len(recent):seq_len - 1] = np.asarray(recent, dtype=np.float32)
+            window[seq_len - 1 - len(recent) : seq_len - 1] = np.asarray(recent, dtype=np.float32)
         return window
 
     # -- core ------------------------------------------------------------

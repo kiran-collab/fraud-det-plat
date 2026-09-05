@@ -140,7 +140,7 @@ module "eks" {
       desired_size   = 0
       capacity_type  = "SPOT"
       labels         = { workload = "training" }
-      taints = [{ key = "workload", value = "training", effect = "NO_SCHEDULE" }]
+      taints         = [{ key = "workload", value = "training", effect = "NO_SCHEDULE" }]
     }
   }
 }

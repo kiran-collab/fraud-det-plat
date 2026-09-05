@@ -28,23 +28,44 @@ def _env_int(name: str, default: int) -> int:
 @dataclass(frozen=True)
 class Paths:
     root: Path = REPO_ROOT
-    data: Path = field(default_factory=lambda: Path(_env("FP_DATA_DIR", str(REPO_ROOT / "artifacts" / "data"))))
-    models: Path = field(default_factory=lambda: Path(_env("FP_MODEL_DIR", str(REPO_ROOT / "artifacts" / "models"))))
-    reports: Path = field(default_factory=lambda: Path(_env("FP_REPORT_DIR", str(REPO_ROOT / "artifacts" / "reports"))))
-    index: Path = field(default_factory=lambda: Path(_env("FP_INDEX_DIR", str(REPO_ROOT / "artifacts" / "index"))))
+    data: Path = field(
+        default_factory=lambda: Path(_env("FP_DATA_DIR", str(REPO_ROOT / "artifacts" / "data")))
+    )
+    models: Path = field(
+        default_factory=lambda: Path(_env("FP_MODEL_DIR", str(REPO_ROOT / "artifacts" / "models")))
+    )
+    reports: Path = field(
+        default_factory=lambda: Path(
+            _env("FP_REPORT_DIR", str(REPO_ROOT / "artifacts" / "reports"))
+        )
+    )
+    index: Path = field(
+        default_factory=lambda: Path(_env("FP_INDEX_DIR", str(REPO_ROOT / "artifacts" / "index")))
+    )
+    audit: Path = field(
+        default_factory=lambda: Path(_env("FP_AUDIT_DIR", str(REPO_ROOT / "artifacts" / "audit")))
+    )
 
     def ensure(self) -> Paths:
-        for p in (self.data, self.models, self.reports, self.index):
+        for p in (self.data, self.models, self.reports, self.index, self.audit):
             p.mkdir(parents=True, exist_ok=True)
         return self
 
 
 @dataclass(frozen=True)
 class KafkaConfig:
-    bootstrap_servers: str = field(default_factory=lambda: _env("KAFKA_BOOTSTRAP_SERVERS", "localhost:9092"))
-    transactions_topic: str = field(default_factory=lambda: _env("KAFKA_TXN_TOPIC", "transactions.raw"))
-    decisions_topic: str = field(default_factory=lambda: _env("KAFKA_DECISION_TOPIC", "fraud.decisions"))
-    consumer_group: str = field(default_factory=lambda: _env("KAFKA_GROUP", "fraudplat-feature-writer"))
+    bootstrap_servers: str = field(
+        default_factory=lambda: _env("KAFKA_BOOTSTRAP_SERVERS", "localhost:9092")
+    )
+    transactions_topic: str = field(
+        default_factory=lambda: _env("KAFKA_TXN_TOPIC", "transactions.raw")
+    )
+    decisions_topic: str = field(
+        default_factory=lambda: _env("KAFKA_DECISION_TOPIC", "fraud.decisions")
+    )
+    consumer_group: str = field(
+        default_factory=lambda: _env("KAFKA_GROUP", "fraudplat-feature-writer")
+    )
 
 
 @dataclass(frozen=True)
@@ -83,13 +104,38 @@ class EnsembleConfig:
 
 
 @dataclass(frozen=True)
+class AuditConfig:
+    """Decision audit logging.
+
+    ``log_approvals`` is off by default. Approvals are 99%+ of traffic and
+    carry no adverse-action obligation, so writing them multiplies audit volume
+    roughly a hundredfold for records nobody queries. Everything that creates
+    friction for a customer - step-up, review, decline - is always recorded.
+    Turn it on where a portfolio's own retention policy requires a record of
+    every authorization decision.
+    """
+
+    enabled: bool = field(
+        default_factory=lambda: _env("FP_AUDIT_ENABLED", "true").lower() == "true"
+    )
+    log_approvals: bool = field(
+        default_factory=lambda: _env("FP_AUDIT_APPROVALS", "false").lower() == "true"
+    )
+    include_features: bool = field(
+        default_factory=lambda: _env("FP_AUDIT_FEATURES", "true").lower() == "true"
+    )
+
+
+@dataclass(frozen=True)
 class GenAIConfig:
     """Investigation assistant settings."""
 
     model: str = field(default_factory=lambda: _env("FP_LLM_MODEL", "claude-opus-5"))
     max_tokens: int = field(default_factory=lambda: _env_int("FP_LLM_MAX_TOKENS", 4096))
     effort: str = field(default_factory=lambda: _env("FP_LLM_EFFORT", "medium"))
-    vector_backend: str = field(default_factory=lambda: _env("FP_VECTOR_BACKEND", "local"))  # local | pinecone
+    vector_backend: str = field(
+        default_factory=lambda: _env("FP_VECTOR_BACKEND", "local")
+    )  # local | pinecone
     pinecone_index: str = field(default_factory=lambda: _env("PINECONE_INDEX", "fraud-cases"))
     embedding_dim: int = field(default_factory=lambda: _env_int("FP_EMBED_DIM", 512))
     top_k: int = field(default_factory=lambda: _env_int("FP_RAG_TOP_K", 6))
@@ -102,6 +148,7 @@ class Settings:
     online_store: OnlineStoreConfig = field(default_factory=OnlineStoreConfig)
     decision: DecisionConfig = field(default_factory=DecisionConfig)
     ensemble: EnsembleConfig = field(default_factory=EnsembleConfig)
+    audit: AuditConfig = field(default_factory=AuditConfig)
     genai: GenAIConfig = field(default_factory=GenAIConfig)
     random_seed: int = field(default_factory=lambda: _env_int("FP_SEED", 17))
 

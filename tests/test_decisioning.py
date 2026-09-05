@@ -10,7 +10,9 @@ from fraudplat.serving.decisioning import Action, decide, top_reasons
 
 @pytest.fixture
 def cfg():
-    return DecisionConfig(decline_at=0.86, review_at=0.55, step_up_at=0.35, high_value_amount=2500.0)
+    return DecisionConfig(
+        decline_at=0.86, review_at=0.55, step_up_at=0.35, high_value_amount=2500.0
+    )
 
 
 @pytest.fixture
@@ -64,8 +66,13 @@ def test_rules_only_escalate_never_downgrade(benign_txn, cfg):
 def test_card_testing_burst_escalates_a_low_score(cfg):
     """The signature is several tiny card-not-present auths in an hour. The
     model may score each one low in isolation; the pattern is the signal."""
-    features = {"card_txn_count_1h": 6.0, "card_distinct_countries_7d": 1.0,
-                "is_new_device_for_card": 0.0, "entry_is_swipe": 0.0, "is_cross_border": 0.0}
+    features = {
+        "card_txn_count_1h": 6.0,
+        "card_distinct_countries_7d": 1.0,
+        "is_new_device_for_card": 0.0,
+        "entry_is_swipe": 0.0,
+        "is_cross_border": 0.0,
+    }
     decision = decide(0.10, {"amount": 3.50}, features, cfg)
     assert decision.action is Action.REVIEW
     assert "velocity.card_testing_burst" in decision.triggered_rules
@@ -81,8 +88,13 @@ def test_high_value_on_new_device_forces_step_up(benign_features, cfg):
 def test_cross_border_swipe_always_leaves_an_audit_record(benign_txn, cfg):
     """Separately reportable, so it must be recorded even when the model is
     unconcerned."""
-    features = {"card_txn_count_1h": 0.0, "card_distinct_countries_7d": 1.0,
-                "is_new_device_for_card": 0.0, "entry_is_swipe": 1.0, "is_cross_border": 1.0}
+    features = {
+        "card_txn_count_1h": 0.0,
+        "card_distinct_countries_7d": 1.0,
+        "is_new_device_for_card": 0.0,
+        "entry_is_swipe": 1.0,
+        "is_cross_border": 1.0,
+    }
     decision = decide(0.01, benign_txn, features, cfg)
     assert "counterfeit.cross_border_swipe" in decision.triggered_rules
     assert decision.action is Action.REVIEW
@@ -104,9 +116,55 @@ def test_reason_codes_are_human_readable_and_ranked():
 
 def test_reason_codes_rank_by_magnitude_not_sign():
     """A strongly *exculpatory* feature is still one of the top drivers of the
-    score and belongs in the explanation."""
+    score and belongs in the analyst-facing explanation."""
     reasons = top_reasons({"amount": 0.2, "merchant_risk_score": -3.0}, k=1)
     assert "merchant" in reasons[0]
+
+
+def test_wording_follows_the_sign_of_the_contribution():
+    """Regression: a protective factor used to be printed with adverse wording.
+
+    A negative SHAP value means the feature *lowered* risk. Rendering it as
+    "unusually short gap since the previous transaction" claimed the opposite
+    of what the model actually found.
+    """
+    adverse = top_reasons({"card_seconds_since_last": 0.45}, k=1)[0]
+    protective = top_reasons({"card_seconds_since_last": -0.45}, k=1)[0]
+
+    assert "unusually short gap" in adverse
+    assert "normal gap" in protective
+    assert "unusually short" not in protective
+
+
+@pytest.mark.parametrize(
+    "feature",
+    ["merchant_risk_score", "is_new_device_for_card", "is_cross_border", "entry_is_swipe"],
+)
+def test_no_feature_reuses_one_phrase_for_both_directions(feature):
+    up = top_reasons({feature: 1.0}, k=1)[0]
+    down = top_reasons({feature: -1.0}, k=1)[0]
+    assert up != down, f"{feature} reads identically whether it raised or lowered risk"
+
+
+def test_adverse_only_excludes_protective_factors():
+    """An adverse-action notice must cite only what caused the adverse action."""
+    contributions = {
+        "merchant_risk_score": 2.4,  # raised risk
+        "card_seconds_since_last": -3.0,  # lowered risk, largest magnitude
+        "entry_is_swipe": 1.1,  # raised risk
+    }
+    notice = top_reasons(contributions, k=4, adverse_only=True)
+    assert len(notice) == 2
+    assert all("+" in r for r in notice), "a protective factor reached the decline notice"
+    assert "normal gap" not in " ".join(notice)
+
+    # The analyst view still surfaces it, ranked first by magnitude.
+    analyst = top_reasons(contributions, k=4)
+    assert "normal gap" in analyst[0]
+
+
+def test_unknown_feature_falls_back_to_its_name():
+    assert "some_new_feature" in top_reasons({"some_new_feature": 0.5}, k=1)[0]
 
 
 def test_action_ranks_are_totally_ordered():

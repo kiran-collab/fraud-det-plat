@@ -29,14 +29,18 @@ class IsolationForestScorer:
     _lo: float = 0.0
     _hi: float = 1.0
 
-    def fit(self, x: np.ndarray, y: np.ndarray | None = None, seed: int = 17) -> IsolationForestScorer:
+    def fit(
+        self, x: np.ndarray, y: np.ndarray | None = None, seed: int = 17
+    ) -> IsolationForestScorer:
         from sklearn.ensemble import IsolationForest
 
         # Fit on the negative class only when labels are available.
         x_fit = x[y == 0] if y is not None else x
         self.model = IsolationForest(
             n_estimators=self.n_estimators,
-            max_samples=min(self.max_samples, len(x_fit)) if isinstance(self.max_samples, int) else self.max_samples,
+            max_samples=min(self.max_samples, len(x_fit))
+            if isinstance(self.max_samples, int)
+            else self.max_samples,
             contamination=self.contamination,
             random_state=seed,
             n_jobs=-1,

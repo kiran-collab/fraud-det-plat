@@ -143,9 +143,7 @@ class InvestigationAssistant:
     # -- prompt assembly -------------------------------------------------
     def _format_transaction(self, req: InvestigationRequest) -> str:
         txn, _ = redact(json.dumps(req.transaction, default=str, indent=2))
-        top_features = sorted(
-            req.feature_snapshot.items(), key=lambda kv: -abs(kv[1])
-        )[:12]
+        top_features = sorted(req.feature_snapshot.items(), key=lambda kv: -abs(kv[1]))[:12]
         return (
             f"Case ID: {req.case_id}\n"
             f"Model risk score: {req.risk_score:.4f}\n"
@@ -229,9 +227,10 @@ class InvestigationAssistant:
             return self._refusal(req, guard, retrieved_ids, output_check.reason or "blocked")
 
         parsed = _parse_json(raw)
-        log.info("investigation audit: %s", audit_entry(
-            req.case_id, req.analyst_question, guard, retrieved_ids, self.config.model
-        ))
+        log.info(
+            "investigation audit: %s",
+            audit_entry(req.case_id, req.analyst_question, guard, retrieved_ids, self.config.model),
+        )
 
         return InvestigationResponse(
             case_id=req.case_id,
@@ -257,14 +256,18 @@ class InvestigationAssistant:
         if isinstance(content, list):
             # Adaptive thinking returns a block list; keep the text blocks only.
             content = "".join(
-                b.get("text", "") for b in content
+                b.get("text", "")
+                for b in content
                 if isinstance(b, dict) and b.get("type") == "text"
             )
         return str(content)
 
     def _refusal(
-        self, req: InvestigationRequest, guard: GuardrailReport,
-        retrieved_ids: list[str], reason: str,
+        self,
+        req: InvestigationRequest,
+        guard: GuardrailReport,
+        retrieved_ids: list[str],
+        reason: str,
     ) -> InvestigationResponse:
         """Degrade to retrieval-only rather than returning nothing.
 
@@ -275,9 +278,11 @@ class InvestigationAssistant:
         return InvestigationResponse(
             case_id=req.case_id,
             summary=f"Assistant unavailable for this case: {reason}. "
-                    f"Retrieved case IDs are still listed for manual review.",
+            f"Retrieved case IDs are still listed for manual review.",
             risk_factors=[],
-            similar_cases=[{"case_id": cid, "relevance": "retrieved by similarity"} for cid in retrieved_ids],
+            similar_cases=[
+                {"case_id": cid, "relevance": "retrieved by similarity"} for cid in retrieved_ids
+            ],
             recommended_checks=["Review the retrieved cases manually."],
             confidence="low",
             evidence_gaps=["automated narrative not generated"],
@@ -297,10 +302,7 @@ def _classify_llm_failure(exc: Exception) -> str:
     """
     text = str(exc).lower()
     if isinstance(exc, ModuleNotFoundError):
-        return (
-            f"optional dependency not installed ({exc.name}); "
-            'run: pip install -e ".[genai]"'
-        )
+        return f'optional dependency not installed ({exc.name}); run: pip install -e ".[genai]"'
     if "authentication" in text or "api_key" in text or "api key" in text:
         return "no Anthropic credentials configured; set ANTHROPIC_API_KEY"
     if "rate limit" in text or "429" in text:
@@ -336,7 +338,7 @@ def _parse_json(text: str) -> dict[str, Any]:
             depth += (text[i] == "{") - (text[i] == "}")
             if depth == 0:
                 try:
-                    return json.loads(text[start:i + 1])
+                    return json.loads(text[start : i + 1])
                 except json.JSONDecodeError:
                     break
         return {"summary": text[:800], "confidence": "low"}

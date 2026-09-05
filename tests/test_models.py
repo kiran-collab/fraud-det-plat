@@ -48,7 +48,7 @@ def test_blend_does_not_inflate_low_risk_traffic():
     detector found mildly unusual, destroying precision at the decline
     threshold. Logit blending must not."""
     ens = _fitted_ensemble()
-    p = np.full(500, 1e-4)                    # confidently legitimate
+    p = np.full(500, 1e-4)  # confidently legitimate
     mildly_odd = np.full(500, ens.ref_iforest + 0.25)
     blended = ens.blend(p, mildly_odd, np.full(500, ens.ref_sequence))
     assert blended.max() < 0.35, "mild anomaly lifted clean traffic into the review band"
@@ -68,7 +68,9 @@ def test_strong_anomaly_can_escalate_but_not_dominate():
 
 
 def test_logit_adjustment_is_bounded():
-    ens = EnsembleScorer(weights=EnsembleConfig(iforest_logit_weight=99.0, sequence_logit_weight=99.0))
+    ens = EnsembleScorer(
+        weights=EnsembleConfig(iforest_logit_weight=99.0, sequence_logit_weight=99.0)
+    )
     p = np.array([0.5])
     high = ens.blend(p, np.array([1.0]), np.array([1.0]))[0]
     # sigmoid(0 + MAX) is the ceiling regardless of how large the weights are.

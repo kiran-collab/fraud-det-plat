@@ -92,7 +92,9 @@ class SupervisedModel:
         total = float(gains.sum()) or 1.0
         return {
             name: float(g) / total
-            for name, g in sorted(zip(self.feature_names, gains, strict=True), key=lambda kv: -kv[1])
+            for name, g in sorted(
+                zip(self.feature_names, gains, strict=True), key=lambda kv: -kv[1]
+            )
         }
 
     # -- persistence -----------------------------------------------------

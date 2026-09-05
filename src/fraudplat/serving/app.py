@@ -17,9 +17,10 @@ import time
 from contextlib import asynccontextmanager
 from typing import Any
 
-from fastapi import FastAPI, HTTPException, Response
+from fastapi import Depends, FastAPI, HTTPException, Response
 from fastapi.responses import JSONResponse
 
+from fraudplat.serving.auth import auth_status, require_api_key
 from fraudplat.serving.schemas import (
     BatchScoreRequest,
     HealthResponse,
@@ -65,6 +66,9 @@ async def lifespan(app: FastAPI):
             _state["scorer"].inference_backend,
             _state["scorer"].store.backend,
         )
+        posture = auth_status()
+        if posture["mode"] != "api_key":
+            log.warning("API authentication is %s: %s", posture["mode"], posture)
     except FileNotFoundError as exc:
         # Start anyway so /health can report *why* the pod is not ready,
         # instead of crash-looping with the reason buried in pod logs.
@@ -98,6 +102,11 @@ def health() -> HealthResponse:
         online_store=scorer.store.health() if scorer else {"backend": "none", "ok": False},
         inference_backend=scorer.inference_backend if scorer else "none",
         uptime_seconds=round(time.time() - STARTED_AT, 1),
+        auth=auth_status(),
+        audit={
+            "enabled": scorer.audit_log is not None if scorer else False,
+            "failures": scorer.audit_failures if scorer else 0,
+        },
     )
 
 
@@ -114,7 +123,7 @@ def ready() -> Response:
 
 
 @app.post("/score", response_model=ScoreResponse)
-def score(request: ScoreRequest) -> ScoreResponse:
+def score(request: ScoreRequest, _: str = Depends(require_api_key)) -> ScoreResponse:
     scorer = _scorer()
     try:
         with METRICS["latency"].time():
@@ -145,7 +154,7 @@ def score(request: ScoreRequest) -> ScoreResponse:
 
 
 @app.post("/score/batch")
-def score_batch(request: BatchScoreRequest) -> dict[str, Any]:
+def score_batch(request: BatchScoreRequest, _: str = Depends(require_api_key)) -> dict[str, Any]:
     """Offline replay / backtesting endpoint.
 
     Deliberately separate from ``/score``: batch callers tolerate seconds of
@@ -165,7 +174,7 @@ def score_batch(request: BatchScoreRequest) -> dict[str, Any]:
 
 
 @app.get("/model")
-def model_info() -> dict[str, Any]:
+def model_info(_: str = Depends(require_api_key)) -> dict[str, Any]:
     """Manifest of the loaded model - what governance and on-call both ask for."""
     scorer = _scorer()
     m = dict(scorer.bundle.manifest)
@@ -174,7 +183,7 @@ def model_info() -> dict[str, Any]:
 
 
 @app.get("/model/importance")
-def model_importance() -> dict[str, float]:
+def model_importance(_: str = Depends(require_api_key)) -> dict[str, float]:
     return _scorer().bundle.supervised.feature_importance()
 
 

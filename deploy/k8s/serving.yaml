@@ -58,6 +58,12 @@ spec:
             - name: FP_AUDIT_SALT
               valueFrom:
                 secretKeyRef: {name: fraudplat-secrets, key: audit-salt}
+            # Comma-separated caller keys. Absent, the service fails closed:
+            # protected endpoints return 503 rather than serving openly, so a
+            # missing secret is an outage rather than a silent security hole.
+            - name: FP_API_KEYS
+              valueFrom:
+                secretKeyRef: {name: fraudplat-secrets, key: api-keys}
           resources:
             # CPU request sized from the measured p50 (~2.6ms/txn on the ONNX
             # path). Limit is 2x request to absorb bursts without throttling,

@@ -86,14 +86,16 @@ def evaluate(
         fp = int((flagged & (y == 0)).sum())
         fn = int((~flagged & (y == 1)).sum())
         tn = int((~flagged & (y == 0)).sum())
-        points.append(OperatingPoint(
-            threshold=t,
-            precision=tp / max(tp + fp, 1),
-            recall=tp / max(tp + fn, 1),
-            false_positive_rate=fp / max(fp + tn, 1),
-            alerts_per_10k=10_000 * (tp + fp) / max(len(y), 1),
-            value_recall=float(amount[flagged & (y == 1)].sum()) / fraud_value,
-        ))
+        points.append(
+            OperatingPoint(
+                threshold=t,
+                precision=tp / max(tp + fp, 1),
+                recall=tp / max(tp + fn, 1),
+                false_positive_rate=fp / max(fp + tn, 1),
+                alerts_per_10k=10_000 * (tp + fp) / max(len(y), 1),
+                value_recall=float(amount[flagged & (y == 1)].sum()) / fraud_value,
+            )
+        )
 
     # Net benefit at the decline threshold: value of fraud stopped, less the
     # cost of the alerts we generate and the good customers we inconvenience.

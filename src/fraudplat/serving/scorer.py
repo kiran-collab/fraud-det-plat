@@ -9,6 +9,7 @@ of work is chosen to keep the common case short:
   4. blend, apply overlay rules                          (negligible)
   5. explain - only when asked, or when declining        (~1-3ms)
   6. write the card state back                           (~1-2ms, one SETEX)
+  7. write the audit record - non-approvals by default   (~0.3ms, one append)
 
 Step 5 is conditional because most transactions are approved and nobody reads
 the reason codes for an approval. Declines always get them: an adverse action
@@ -16,10 +17,19 @@ without a recorded reason is a compliance problem, not just a UX gap.
 
 Step 6 is skipped for ``commit=false`` quotes so a speculative score cannot
 pollute a cardholder's behavioural baseline.
+
+Step 7 records every decision that creates friction for a customer - step-up,
+review, decline. Approvals are excluded by default because they are 99%+ of
+traffic and carry no adverse-action obligation; ``FP_AUDIT_APPROVALS=true``
+turns them on where a portfolio's retention policy demands a record of every
+authorization. The write can never fail a transaction: an authorization
+service that declines live traffic because a log file could not be opened has
+converted a logging problem into a revenue problem.
 """
 
 from __future__ import annotations
 
+import logging
 import time
 from dataclasses import dataclass
 from datetime import UTC, datetime
@@ -31,8 +41,11 @@ import numpy as np
 from fraudplat.config import SETTINGS
 from fraudplat.features.store.online import OnlineFeatureStore
 from fraudplat.features.transforms import FEATURE_NAMES, FeatureEngine
+from fraudplat.governance.audit import AuditLog
 from fraudplat.models.registry import ModelBundle, ModelRegistry
 from fraudplat.serving.decisioning import Action, decide, top_reasons
+
+log = logging.getLogger(__name__)
 
 
 @dataclass
@@ -54,17 +67,28 @@ class TransactionScorer:
         bundle: ModelBundle | None = None,
         store: OnlineFeatureStore | None = None,
         use_onnx: bool = True,
+        audit_log: AuditLog | None = None,
     ) -> None:
         self.registry = ModelRegistry()
         self.bundle = bundle or self.registry.load()
         self.store = store or OnlineFeatureStore()
         self.engine = FeatureEngine(self.bundle.merchant_profile)
         self.decision_cfg = SETTINGS.decision
+        self.audit_cfg = SETTINGS.audit
         self._explainer = None
         self._onnx = None
         self.inference_backend = "python"
+        self.audit_failures = 0
         if use_onnx:
             self._try_load_onnx()
+
+        if audit_log is not None:
+            self.audit_log = audit_log
+        elif self.audit_cfg.enabled:
+            SETTINGS.paths.audit.mkdir(parents=True, exist_ok=True)
+            self.audit_log = AuditLog(SETTINGS.paths.audit / "decisions.jsonl")
+        else:
+            self.audit_log = None
 
     # -- setup -----------------------------------------------------------
     def _try_load_onnx(self) -> None:
@@ -106,7 +130,9 @@ class TransactionScorer:
         return self.bundle.version
 
     # -- scoring ---------------------------------------------------------
-    def score(self, txn: dict[str, Any], explain: bool = False, commit: bool = True) -> ScoringResult:
+    def score(
+        self, txn: dict[str, Any], explain: bool = False, commit: bool = True
+    ) -> ScoringResult:
         t0 = time.perf_counter()
         txn = dict(txn)
         # `event_time` is optional in the request schema, so it arrives either
@@ -144,7 +170,13 @@ class TransactionScorer:
         # 5. explain when asked, and always on an adverse action
         reasons: list[str] = []
         if explain or decision.action is Action.DECLINE:
-            reasons = top_reasons(self.explainer.explain_row(vector))
+            # A decline is an adverse action, so its notice must list only the
+            # factors that argued *for* declining. The analyst view keeps both
+            # directions, where knowing what argued the other way is useful.
+            reasons = top_reasons(
+                self.explainer.explain_row(vector),
+                adverse_only=decision.action is Action.DECLINE,
+            )
         decision.reasons = reasons
 
         # 6. persist
@@ -152,7 +184,7 @@ class TransactionScorer:
             self.store.put_card_state(card_id, self.engine.dump_card(card_id))
         self.engine.reset_card(card_id)
 
-        return ScoringResult(
+        result = ScoringResult(
             action=decision.action.value,
             risk_score=risk.score,
             supervised_score=risk.supervised,
@@ -163,6 +195,36 @@ class TransactionScorer:
             features=features,
             latency_ms=round((time.perf_counter() - t0) * 1000, 3),
         )
+
+        # 7. audit. Written after the latency figure is stamped so the number
+        # reported to the caller measures the scoring decision, not the disk.
+        self._write_audit(txn["transaction_id"], card_id, decision.action, result)
+        return result
+
+    def _write_audit(self, transaction_id: str, card_id: str, action: Action, result) -> None:
+        """Record the decision.
+
+        Never allowed to fail a transaction. If the audit sink is unavailable
+        the right behaviour for an authorization service is to approve or
+        decline on the model's judgement and raise an operational alarm - not
+        to reject live traffic because a log file could not be opened. The
+        error is logged loudly and the counter is exposed for alerting.
+        """
+        if self.audit_log is None:
+            return
+        if action is Action.APPROVE and not self.audit_cfg.log_approvals:
+            return
+        try:
+            self.audit_log.append(
+                transaction_id=transaction_id,
+                card_id=card_id,
+                model_version=self.model_version,
+                result=result,
+                include_features=self.audit_cfg.include_features,
+            )
+        except Exception:
+            self.audit_failures += 1
+            log.exception("failed to write audit record for %s", transaction_id)
 
     def _sequence_score(self, window: np.ndarray | None, vector: np.ndarray) -> float:
         """Neutral 0.5 when the card has no usable history.

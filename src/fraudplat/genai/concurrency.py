@@ -400,12 +400,10 @@ async def gather_bounded(
         async with semaphore:
             return await factory()
 
-    return await asyncio.gather(
-        *(run(f) for f in factories), return_exceptions=return_exceptions
-    )
+    return await asyncio.gather(*(run(f) for f in factories), return_exceptions=return_exceptions)
 
 
 def chunked(items: Sequence[Any], size: int) -> list[Sequence[Any]]:
     if size < 1:
         raise ValueError("size must be >= 1")
-    return [items[i:i + size] for i in range(0, len(items), size)]
+    return [items[i : i + size] for i in range(0, len(items), size)]

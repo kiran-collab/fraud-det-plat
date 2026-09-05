@@ -64,9 +64,7 @@ class AuditRecord:
 
     def compute_hash(self) -> str:
         payload = {k: v for k, v in asdict(self).items() if k != "record_hash"}
-        return hashlib.sha256(
-            json.dumps(payload, sort_keys=True, default=str).encode()
-        ).hexdigest()
+        return hashlib.sha256(json.dumps(payload, sort_keys=True, default=str).encode()).hexdigest()
 
 
 class AuditLog:
@@ -122,7 +120,8 @@ class AuditLog:
                 triggered_rules=list(result.triggered_rules),
                 feature_snapshot=(
                     {k: round(float(v), 6) for k, v in result.features.items()}
-                    if include_features else {}
+                    if include_features
+                    else {}
                 ),
                 prev_hash=self._last_hash,
             )

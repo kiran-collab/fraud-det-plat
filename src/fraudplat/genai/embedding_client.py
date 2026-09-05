@@ -166,7 +166,7 @@ class AsyncEmbeddingClient:
                 continue
             batch_index, vectors = result
             start = offsets[batch_index]
-            out[start:start + len(vectors)] = np.asarray(vectors, dtype=np.float32)
+            out[start : start + len(vectors)] = np.asarray(vectors, dtype=np.float32)
             report.succeeded += 1
 
         report.elapsed_seconds = self.clock.now() - started

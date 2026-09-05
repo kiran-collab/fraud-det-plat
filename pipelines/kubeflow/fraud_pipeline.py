@@ -59,8 +59,16 @@ def train_models(
     import subprocess
 
     subprocess.run(
-        ["python", "scripts/train.py", "--data", input_data.path,
-         "--seed", str(seed), "--version", "candidate"],
+        [
+            "python",
+            "scripts/train.py",
+            "--data",
+            input_data.path,
+            "--seed",
+            str(seed),
+            "--version",
+            "candidate",
+        ],
         check=True,
         env={"FP_MODEL_DIR": model_dir.path},
     )
@@ -82,8 +90,15 @@ def run_governance_checks(
     import subprocess
 
     result = subprocess.run(
-        ["python", "scripts/governance_report.py",
-         "--data", input_data.path, "--version", "candidate", "--strict"],
+        [
+            "python",
+            "scripts/governance_report.py",
+            "--data",
+            input_data.path,
+            "--version",
+            "candidate",
+            "--strict",
+        ],
         env={"FP_MODEL_DIR": model_dir.path, "FP_REPORT_DIR": report.path},
     )
     return result.returncode == 0
@@ -167,9 +182,7 @@ def fraud_training_pipeline(
     with dsl.If(governance.output == True, name="governance-passed"):  # noqa: E712
         with dsl.If(champion.output == True, name="beats-champion"):  # noqa: E712
             exported = export_and_quantize(model_dir=trained.outputs["model_dir"])
-            promote(
-                model_dir=trained.outputs["model_dir"], version="candidate"
-            ).after(exported)
+            promote(model_dir=trained.outputs["model_dir"], version="candidate").after(exported)
 
 
 if __name__ == "__main__":

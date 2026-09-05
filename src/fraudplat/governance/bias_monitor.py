@@ -50,12 +50,12 @@ class SegmentMetrics:
     segment: str
     n: int
     n_fraud: int
-    selection_rate: float          # share flagged at the decision threshold
+    selection_rate: float  # share flagged at the decision threshold
     true_positive_rate: float | None
     false_positive_rate: float
     precision: float | None
     mean_score: float
-    reliable: bool                 # sample large enough to interpret
+    reliable: bool  # sample large enough to interpret
 
 
 @dataclass
@@ -63,7 +63,7 @@ class BiasReport:
     attribute: str
     threshold: float
     segments: list[SegmentMetrics] = field(default_factory=list)
-    selection_rate_disparity: float = 0.0   # max/min ratio across reliable segments
+    selection_rate_disparity: float = 0.0  # max/min ratio across reliable segments
     tpr_gap: float = 0.0
     fpr_gap: float = 0.0
     adverse_impact_ratio: float = 1.0
@@ -108,17 +108,19 @@ def evaluate_bias(
         fp = int((seg_flag & (seg_y == 0)).sum())
         n_legit = int((seg_y == 0).sum())
 
-        report.segments.append(SegmentMetrics(
-            segment=str(value),
-            n=len(idx),
-            n_fraud=n_fraud,
-            selection_rate=float(seg_flag.mean()),
-            true_positive_rate=(tp / n_fraud) if n_fraud >= MIN_POSITIVES_FOR_TPR else None,
-            false_positive_rate=(fp / n_legit) if n_legit else 0.0,
-            precision=(tp / (tp + fp)) if (tp + fp) else None,
-            mean_score=float(seg_score.mean()),
-            reliable=len(idx) >= MIN_SEGMENT_SIZE,
-        ))
+        report.segments.append(
+            SegmentMetrics(
+                segment=str(value),
+                n=len(idx),
+                n_fraud=n_fraud,
+                selection_rate=float(seg_flag.mean()),
+                true_positive_rate=(tp / n_fraud) if n_fraud >= MIN_POSITIVES_FOR_TPR else None,
+                false_positive_rate=(fp / n_legit) if n_legit else 0.0,
+                precision=(tp / (tp + fp)) if (tp + fp) else None,
+                mean_score=float(seg_score.mean()),
+                reliable=len(idx) >= MIN_SEGMENT_SIZE,
+            )
+        )
 
     reliable = [s for s in report.segments if s.reliable]
     if len(reliable) < 2:

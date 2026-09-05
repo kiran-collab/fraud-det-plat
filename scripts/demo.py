@@ -72,8 +72,12 @@ def main() -> int:
     print("\n[1] Streaming 20 ordinary transactions through the feature writer")
     writer = FeatureStreamWriter(bundle.merchant_profile, store)
     history = [
-        txn(-60 * 24 * (20 - i), amount=30 + (i * 7) % 60,
-            merchant_id=f"mch_{i % 5:06d}", transaction_id=f"hist_{i:03d}")
+        txn(
+            -60 * 24 * (20 - i),
+            amount=30 + (i * 7) % 60,
+            merchant_id=f"mch_{i % 5:06d}",
+            transaction_id=f"hist_{i:03d}",
+        )
         for i in range(20)
     ]
     writer.run(iter(history), log_every=0)
@@ -85,36 +89,65 @@ def main() -> int:
     # --- 2. score a range of scenarios ------------------------------------
     print("\n[2] Scoring scenarios against that history")
 
-    show("Normal grocery purchase, familiar merchant and device",
-         scorer.score(txn(0), explain=True, commit=False))
+    show(
+        "Normal grocery purchase, familiar merchant and device",
+        scorer.score(txn(0), explain=True, commit=False),
+    )
 
-    show("Same amount, but a merchant category the card never uses",
-         scorer.score(txn(1, merchant_category="gambling", merchant_id="mch_000777",
-                          channel="ecom", entry_mode="keyed"),
-                      explain=True, commit=False))
+    show(
+        "Same amount, but a merchant category the card never uses",
+        scorer.score(
+            txn(
+                1,
+                merchant_category="gambling",
+                merchant_id="mch_000777",
+                channel="ecom",
+                entry_mode="keyed",
+            ),
+            explain=True,
+            commit=False,
+        ),
+    )
 
-    show("High-value purchase from a device never seen on this card",
-         scorer.score(txn(2, amount=3800.0, device_id="dev_unknown_9",
-                          channel="ecom", entry_mode="keyed"),
-                      explain=True, commit=False))
+    show(
+        "High-value purchase from a device never seen on this card",
+        scorer.score(
+            txn(2, amount=3800.0, device_id="dev_unknown_9", channel="ecom", entry_mode="keyed"),
+            explain=True,
+            commit=False,
+        ),
+    )
 
-    show("Magnetic-stripe swipe in a country the card has never visited",
-         scorer.score(txn(3, amount=610.0, merchant_country="RO",
-                          entry_mode="swipe", channel="pos"),
-                      explain=True, commit=False))
+    show(
+        "Magnetic-stripe swipe in a country the card has never visited",
+        scorer.score(
+            txn(3, amount=610.0, merchant_country="RO", entry_mode="swipe", channel="pos"),
+            explain=True,
+            commit=False,
+        ),
+    )
 
     # Card-testing needs real velocity, so these must be committed.
     print("\n  Card-testing burst (six tiny card-not-present auths, ~2 min apart)")
     for i in range(6):
         result = scorer.score(
-            txn(10 + i * 2, amount=2.50 + i, merchant_id="mch_000999",
-                merchant_category="digital_goods", channel="ecom", entry_mode="keyed",
-                transaction_id=f"burst_{i}"),
-            explain=(i == 5), commit=True,
+            txn(
+                10 + i * 2,
+                amount=2.50 + i,
+                merchant_id="mch_000999",
+                merchant_category="digital_goods",
+                channel="ecom",
+                entry_mode="keyed",
+                transaction_id=f"burst_{i}",
+            ),
+            explain=(i == 5),
+            commit=True,
         )
-        print(f"    #{i + 1}  {result.action:<9} risk={result.risk_score:.4f}"
-              f"  1h_count={result.features['card_txn_count_1h']:.0f}"
-              + (f"   rules: {', '.join(result.triggered_rules)}" if result.triggered_rules else ""))
+        print(
+            f"    #{i + 1}  {result.action:<9} risk={result.risk_score:.4f}"
+            f"  1h_count={result.features['card_txn_count_1h']:.0f}"
+            + (f"   rules: {', '.join(result.triggered_rules)}" if result.triggered_rules else "")
+        )
 
     # --- 3. investigation assistant ---------------------------------------
     print("\n[3] Investigation assistant (RAG over historical cases)")
@@ -126,8 +159,14 @@ def main() -> int:
         print("    case index is empty - run: python scripts/build_case_index.py")
         return 0
 
-    suspicious = txn(30, amount=3800.0, device_id="dev_unknown_9",
-                     channel="ecom", entry_mode="keyed", merchant_category="electronics")
+    suspicious = txn(
+        30,
+        amount=3800.0,
+        device_id="dev_unknown_9",
+        channel="ecom",
+        entry_mode="keyed",
+        merchant_category="electronics",
+    )
     scored = scorer.score(suspicious, explain=True, commit=False)
     request = InvestigationRequest(
         case_id="CASE-DEMO-001",
@@ -140,8 +179,10 @@ def main() -> int:
 
     assistant = InvestigationAssistant(index=index)
     response = assistant.investigate(request)
-    print(f"    retrieved {len(response.retrieved_case_ids)} comparable cases "
-          f"from the {response.vector_backend} index")
+    print(
+        f"    retrieved {len(response.retrieved_case_ids)} comparable cases "
+        f"from the {response.vector_backend} index"
+    )
     if response.blocked:
         print(f"    assistant unavailable: {response.summary}")
         print("    (set ANTHROPIC_API_KEY and install langchain-anthropic for the narrative)")

@@ -125,10 +125,9 @@ class EnsembleScorer:
         s_sequence: np.ndarray,
     ) -> np.ndarray:
         base = _logit(self.calibrate(np.asarray(p_supervised)))
-        adjustment = (
-            self.weights.iforest_logit_weight * (np.asarray(s_iforest) - self.ref_iforest)
-            + self.weights.sequence_logit_weight * (np.asarray(s_sequence) - self.ref_sequence)
-        )
+        adjustment = self.weights.iforest_logit_weight * (
+            np.asarray(s_iforest) - self.ref_iforest
+        ) + self.weights.sequence_logit_weight * (np.asarray(s_sequence) - self.ref_sequence)
         adjustment = np.clip(adjustment, -MAX_LOGIT_ADJUSTMENT, MAX_LOGIT_ADJUSTMENT)
         return _sigmoid(base + adjustment)
 
@@ -149,12 +148,16 @@ class EnsembleScorer:
 
         path.parent.mkdir(parents=True, exist_ok=True)
         joblib.dump(self.calibrator, path)
-        path.with_suffix(".weights.json").write_text(json.dumps({
-            "iforest_logit_weight": self.weights.iforest_logit_weight,
-            "sequence_logit_weight": self.weights.sequence_logit_weight,
-            "ref_iforest": self.ref_iforest,
-            "ref_sequence": self.ref_sequence,
-        }))
+        path.with_suffix(".weights.json").write_text(
+            json.dumps(
+                {
+                    "iforest_logit_weight": self.weights.iforest_logit_weight,
+                    "sequence_logit_weight": self.weights.sequence_logit_weight,
+                    "ref_iforest": self.ref_iforest,
+                    "ref_sequence": self.ref_sequence,
+                }
+            )
+        )
 
     @classmethod
     def load(cls, path: Path) -> EnsembleScorer:

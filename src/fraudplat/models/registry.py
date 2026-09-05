@@ -75,7 +75,8 @@ class ModelRegistry:
 
     def list_versions(self) -> list[str]:
         return sorted(
-            p.name for p in self.root.iterdir()
+            p.name
+            for p in self.root.iterdir()
             if p.is_dir() and p.name != "current" and (p / "manifest.json").exists()
         )
 
