@@ -36,8 +36,16 @@ index: ## Build the RAG case index
 governance: ## Fairness, drift and performance pack
 	$(PY) scripts/governance_report.py
 
+.PHONY: analytics
+analytics: ## Build marts, KPIs, threshold economics and BI extracts
+	$(PY) scripts/build_analytics.py
+
+.PHONY: table
+table: ## Export a ready-to-train feature table
+	$(PY) scripts/export_training_table.py
+
 .PHONY: all
-all: train export index governance ## Full pipeline from scratch
+all: train export index governance analytics ## Full pipeline from scratch
 
 # --- run -----------------------------------------------------------------
 .PHONY: serve

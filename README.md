@@ -469,6 +469,7 @@ have taken an action, because the assistant is advisory and has no write path.
 
 ```
 src/fraudplat/
+  analytics/      metric layer, DuckDB marts, data-quality gates, threshold economics, BI extracts
   data/           transaction schema + synthetic generator with realistic attack patterns
   features/       the shared feature engine; Feast definitions; Kafka producer/consumer
   models/         LightGBM, Isolation Forest, PyTorch transformer, ensemble, registry
@@ -481,7 +482,7 @@ scripts/          train, export, benchmark, governance, demo, index build
 pipelines/        Kubeflow training + promotion pipeline with gates
 infra/terraform/  EKS, MSK, ElastiCache, S3, KMS, IRSA
 deploy/k8s/       deployments, HPA/KEDA autoscaling, PDB
-docs/             architecture and model governance
+docs/             architecture, model governance, analytics framework
 ```
 
 ---
@@ -538,7 +539,7 @@ assistant degrades to retrieval-only rather than failing — retrieved case IDs 
 ## Testing
 
 ```bash
-make test    # 152 tests
+make test    # 174 tests
 make lint
 ```
 

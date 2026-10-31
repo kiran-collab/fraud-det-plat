@@ -34,6 +34,7 @@ export = [
     "onnxscript>=0.1",
 ]
 explain = ["shap>=0.44", "lime>=0.2"]
+analytics = ["duckdb>=1.0"]
 streaming = ["kafka-python>=2.0", "feast[redis,aws]>=0.36"]
 genai = [
     "langchain>=0.2",
