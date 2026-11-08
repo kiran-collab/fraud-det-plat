@@ -1,0 +1,71 @@
+table 'Threshold Sensitivity'
+	lineageTag: 9623bf08-17d4-53d8-8006-18b46581e90e
+
+	column assumption
+		dataType: string
+		lineageTag: 1b588be2-9458-5059-bf00-a1477bcc7d80
+		summarizeBy: none
+		sourceColumn: assumption
+
+		annotation SummarizationSetBy = Automatic
+
+	column multiplier
+		dataType: double
+		lineageTag: 2b43c857-be7f-519c-ad1c-6dc543dd1d3e
+		summarizeBy: sum
+		sourceColumn: multiplier
+
+		annotation SummarizationSetBy = Automatic
+
+	column value
+		dataType: double
+		lineageTag: 471ab482-6cb0-520f-9d4f-e9f3234a1619
+		summarizeBy: sum
+		sourceColumn: value
+
+		annotation SummarizationSetBy = Automatic
+
+	column optimal_threshold
+		dataType: double
+		lineageTag: e1086a4a-fca2-58fe-9f24-64bacba0984e
+		summarizeBy: sum
+		sourceColumn: optimal_threshold
+
+		annotation SummarizationSetBy = Automatic
+
+	column net_benefit
+		dataType: double
+		lineageTag: 21bf8a56-0e75-5fa4-af94-857cefb8cb46
+		summarizeBy: sum
+		sourceColumn: net_benefit
+
+		annotation SummarizationSetBy = Automatic
+
+	column detection_rate
+		dataType: double
+		lineageTag: 912bc870-af5c-536b-b1fd-6c3d31ebc50a
+		summarizeBy: sum
+		sourceColumn: detection_rate
+
+		annotation SummarizationSetBy = Automatic
+
+	column false_declines
+		dataType: double
+		lineageTag: 66f4e5d2-f171-5996-b956-653de202edfb
+		summarizeBy: sum
+		sourceColumn: false_declines
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'Threshold Sensitivity' = m
+		mode: import
+		source =
+				let
+				    Source = Csv.Document(File.Contents(ExtractsFolder & "/threshold_sensitivity.csv"),
+				        [Delimiter = ",", Encoding = 65001, QuoteStyle = QuoteStyle.Csv]),
+				    Promoted = Table.PromoteHeaders(Source, [PromoteAllScalars = true]),
+				    Typed = Table.TransformColumnTypes(Promoted, {{"assumption", type text}, {"multiplier", type number}, {"value", type number}, {"optimal_threshold", type number}, {"net_benefit", type number}, {"detection_rate", type number}, {"false_declines", type number}})
+				in
+				    Typed
+
+	annotation PBI_ResultType = Table

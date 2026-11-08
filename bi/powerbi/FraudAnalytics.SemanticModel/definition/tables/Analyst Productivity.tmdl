@@ -1,0 +1,55 @@
+table 'Analyst Productivity'
+	lineageTag: cd61b241-1441-513c-badd-19530450a82d
+
+	column analyst_id
+		dataType: string
+		lineageTag: 136e0e70-f4a5-5b10-9455-9966bc0ae286
+		summarizeBy: none
+		sourceColumn: analyst_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column alerts_worked
+		dataType: double
+		lineageTag: c4f58cd5-a342-5d1c-8505-906061efb6ee
+		summarizeBy: sum
+		sourceColumn: alerts_worked
+
+		annotation SummarizationSetBy = Automatic
+
+	column avg_handling_minutes
+		dataType: double
+		lineageTag: 63b848e1-eac9-5e40-b9c0-83f688142f60
+		summarizeBy: sum
+		sourceColumn: avg_handling_minutes
+
+		annotation SummarizationSetBy = Automatic
+
+	column sla_breach_rate
+		dataType: double
+		lineageTag: f1c6cfbe-942e-50c4-8901-61235ffea0e6
+		summarizeBy: sum
+		sourceColumn: sla_breach_rate
+
+		annotation SummarizationSetBy = Automatic
+
+	column fraud_confirmed
+		dataType: double
+		lineageTag: 388e94ce-b47b-54be-b1c5-74fcd99481b7
+		summarizeBy: sum
+		sourceColumn: fraud_confirmed
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'Analyst Productivity' = m
+		mode: import
+		source =
+				let
+				    Source = Csv.Document(File.Contents(ExtractsFolder & "/analyst_productivity.csv"),
+				        [Delimiter = ",", Encoding = 65001, QuoteStyle = QuoteStyle.Csv]),
+				    Promoted = Table.PromoteHeaders(Source, [PromoteAllScalars = true]),
+				    Typed = Table.TransformColumnTypes(Promoted, {{"analyst_id", type text}, {"alerts_worked", type number}, {"avg_handling_minutes", type number}, {"sla_breach_rate", type number}, {"fraud_confirmed", type number}})
+				in
+				    Typed
+
+	annotation PBI_ResultType = Table

@@ -1,0 +1,55 @@
+table 'Cost Assumptions'
+	lineageTag: 4b20e72b-ef6a-5805-b37f-445fb34a2a67
+
+	column recovery_rate
+		dataType: double
+		lineageTag: 28e80cfb-be3f-54e2-af19-db0ee9868c93
+		summarizeBy: sum
+		sourceColumn: recovery_rate
+
+		annotation SummarizationSetBy = Automatic
+
+	column review_cost
+		dataType: double
+		lineageTag: d9f5b670-431e-5b37-90ac-5aecba559834
+		summarizeBy: sum
+		sourceColumn: review_cost
+
+		annotation SummarizationSetBy = Automatic
+
+	column false_decline_cost
+		dataType: double
+		lineageTag: a163029d-8b96-5c34-abc8-2d34c2e07ed0
+		summarizeBy: sum
+		sourceColumn: false_decline_cost
+
+		annotation SummarizationSetBy = Automatic
+
+	column step_up_cost
+		dataType: double
+		lineageTag: 26e6413f-9fcc-58d9-83a1-3b29afc3dc83
+		summarizeBy: sum
+		sourceColumn: step_up_cost
+
+		annotation SummarizationSetBy = Automatic
+
+	column chargeback_fee
+		dataType: double
+		lineageTag: 52e3bc35-a58d-5317-8707-47642c017b9e
+		summarizeBy: sum
+		sourceColumn: chargeback_fee
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'Cost Assumptions' = m
+		mode: import
+		source =
+				let
+				    Source = Csv.Document(File.Contents(ExtractsFolder & "/cost_assumptions.csv"),
+				        [Delimiter = ",", Encoding = 65001, QuoteStyle = QuoteStyle.Csv]),
+				    Promoted = Table.PromoteHeaders(Source, [PromoteAllScalars = true]),
+				    Typed = Table.TransformColumnTypes(Promoted, {{"recovery_rate", type number}, {"review_cost", type number}, {"false_decline_cost", type number}, {"step_up_cost", type number}, {"chargeback_fee", type number}})
+				in
+				    Typed
+
+	annotation PBI_ResultType = Table

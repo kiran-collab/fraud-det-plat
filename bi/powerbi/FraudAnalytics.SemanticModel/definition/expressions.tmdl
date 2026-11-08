@@ -1,0 +1,6 @@
+expression ExtractsFolder = "C:/path/to/fraud-det-plat/artifacts/analytics/extracts" meta [IsParameterQuery=true, Type="Text", IsParameterQueryRequired=true]
+	lineageTag: abe5d805-dbf7-54cf-b51e-fcc1b27ba482
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Text

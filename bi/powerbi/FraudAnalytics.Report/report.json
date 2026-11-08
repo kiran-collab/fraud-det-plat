@@ -1,0 +1,295 @@
+{
+  "config": "{\"version\":\"5.43\",\"activeSectionIndex\":0,\"defaultDrillFilterOtherVisuals\":true}",
+  "layoutOptimization": 0,
+  "resourcePackages": [],
+  "pods": [],
+  "publicCustomVisuals": [],
+  "sections": [
+    {
+      "name": "pgOverview",
+      "displayName": "Overview",
+      "filters": "[]",
+      "ordinal": 0,
+      "visualContainers": [
+        {
+          "x": 16,
+          "y": 16,
+          "z": 0,
+          "width": 296,
+          "height": 120,
+          "config": "{\"name\":\"ov_card0\",\"layouts\":[{\"id\":0,\"position\":{\"x\":16,\"y\":16,\"z\":0,\"width\":296,\"height\":120}}],\"singleVisual\":{\"visualType\":\"card\",\"projections\":{\"Values\":[{\"queryRef\":\"KPI Overall.Value detection rate\"}]},\"prototypeQuery\":{\"Version\":2,\"From\":[{\"Name\":\"t\",\"Entity\":\"KPI Overall\",\"Type\":0}],\"Select\":[{\"Measure\":{\"Expression\":{\"SourceRef\":{\"Source\":\"t\"}},\"Property\":\"Value detection rate\"},\"Name\":\"KPI Overall.Value detection rate\",\"NativeReferenceName\":\"Value detection rate\"}]},\"drillFilterOtherVisuals\":true,\"objects\":{},\"vcObjects\":{\"title\":[{\"properties\":{\"show\":{\"expr\":{\"Literal\":{\"Value\":\"true\"}}},\"text\":{\"expr\":{\"Literal\":{\"Value\":\"'Value detection rate'\"}}}}}]}}}",
+          "filters": "[]"
+        },
+        {
+          "x": 328,
+          "y": 16,
+          "z": 0,
+          "width": 296,
+          "height": 120,
+          "config": "{\"name\":\"ov_card1\",\"layouts\":[{\"id\":0,\"position\":{\"x\":328,\"y\":16,\"z\":0,\"width\":296,\"height\":120}}],\"singleVisual\":{\"visualType\":\"card\",\"projections\":{\"Values\":[{\"queryRef\":\"KPI Overall.False positives per catch\"}]},\"prototypeQuery\":{\"Version\":2,\"From\":[{\"Name\":\"t\",\"Entity\":\"KPI Overall\",\"Type\":0}],\"Select\":[{\"Measure\":{\"Expression\":{\"SourceRef\":{\"Source\":\"t\"}},\"Property\":\"False positives per catch\"},\"Name\":\"KPI Overall.False positives per catch\",\"NativeReferenceName\":\"False positives per catch\"}]},\"drillFilterOtherVisuals\":true,\"objects\":{},\"vcObjects\":{\"title\":[{\"properties\":{\"show\":{\"expr\":{\"Literal\":{\"Value\":\"true\"}}},\"text\":{\"expr\":{\"Literal\":{\"Value\":\"'False positives per catch'\"}}}}}]}}}",
+          "filters": "[]"
+        },
+        {
+          "x": 640,
+          "y": 16,
+          "z": 0,
+          "width": 296,
+          "height": 120,
+          "config": "{\"name\":\"ov_card2\",\"layouts\":[{\"id\":0,\"position\":{\"x\":640,\"y\":16,\"z\":0,\"width\":296,\"height\":120}}],\"singleVisual\":{\"visualType\":\"card\",\"projections\":{\"Values\":[{\"queryRef\":\"KPI Overall.Fraud loss (bps of spend)\"}]},\"prototypeQuery\":{\"Version\":2,\"From\":[{\"Name\":\"t\",\"Entity\":\"KPI Overall\",\"Type\":0}],\"Select\":[{\"Measure\":{\"Expression\":{\"SourceRef\":{\"Source\":\"t\"}},\"Property\":\"Fraud loss (bps of spend)\"},\"Name\":\"KPI Overall.Fraud loss (bps of spend)\",\"NativeReferenceName\":\"Fraud loss (bps of spend)\"}]},\"drillFilterOtherVisuals\":true,\"objects\":{},\"vcObjects\":{\"title\":[{\"properties\":{\"show\":{\"expr\":{\"Literal\":{\"Value\":\"true\"}}},\"text\":{\"expr\":{\"Literal\":{\"Value\":\"'Fraud loss (bps of spend)'\"}}}}}]}}}",
+          "filters": "[]"
+        },
+        {
+          "x": 952,
+          "y": 16,
+          "z": 0,
+          "width": 296,
+          "height": 120,
+          "config": "{\"name\":\"ov_card3\",\"layouts\":[{\"id\":0,\"position\":{\"x\":952,\"y\":16,\"z\":0,\"width\":296,\"height\":120}}],\"singleVisual\":{\"visualType\":\"card\",\"projections\":{\"Values\":[{\"queryRef\":\"KPI Overall.Detection rate (recall)\"}]},\"prototypeQuery\":{\"Version\":2,\"From\":[{\"Name\":\"t\",\"Entity\":\"KPI Overall\",\"Type\":0}],\"Select\":[{\"Measure\":{\"Expression\":{\"SourceRef\":{\"Source\":\"t\"}},\"Property\":\"Detection rate (recall)\"},\"Name\":\"KPI Overall.Detection rate (recall)\",\"NativeReferenceName\":\"Detection rate (recall)\"}]},\"drillFilterOtherVisuals\":true,\"objects\":{},\"vcObjects\":{\"title\":[{\"properties\":{\"show\":{\"expr\":{\"Literal\":{\"Value\":\"true\"}}},\"text\":{\"expr\":{\"Literal\":{\"Value\":\"'Detection rate (recall)'\"}}}}}]}}}",
+          "filters": "[]"
+        },
+        {
+          "x": 16,
+          "y": 152,
+          "z": 0,
+          "width": 296,
+          "height": 150,
+          "config": "{\"name\":\"ov_q\",\"layouts\":[{\"id\":0,\"position\":{\"x\":16,\"y\":152,\"z\":0,\"width\":296,\"height\":150}}],\"singleVisual\":{\"visualType\":\"multiRowCard\",\"projections\":{\"Values\":[{\"queryRef\":\"Data Quality.Checks passing\"},{\"queryRef\":\"Data Quality.Publishable\"}]},\"prototypeQuery\":{\"Version\":2,\"From\":[{\"Name\":\"t\",\"Entity\":\"Data Quality\",\"Type\":0}],\"Select\":[{\"Measure\":{\"Expression\":{\"SourceRef\":{\"Source\":\"t\"}},\"Property\":\"Checks passing\"},\"Name\":\"Data Quality.Checks passing\",\"NativeReferenceName\":\"Checks passing\"},{\"Measure\":{\"Expression\":{\"SourceRef\":{\"Source\":\"t\"}},\"Property\":\"Publishable\"},\"Name\":\"Data Quality.Publishable\",\"NativeReferenceName\":\"Publishable\"}]},\"drillFilterOtherVisuals\":true,\"objects\":{},\"vcObjects\":{\"title\":[{\"properties\":{\"show\":{\"expr\":{\"Literal\":{\"Value\":\"true\"}}},\"text\":{\"expr\":{\"Literal\":{\"Value\":\"'Data quality gate'\"}}}}}]}}}",
+          "filters": "[]"
+        },
+        {
+          "x": 328,
+          "y": 152,
+          "z": 0,
+          "width": 936,
+          "height": 552,
+          "config": "{\"name\":\"ov_tbl\",\"layouts\":[{\"id\":0,\"position\":{\"x\":328,\"y\":152,\"z\":0,\"width\":936,\"height\":552}}],\"singleVisual\":{\"visualType\":\"tableEx\",\"projections\":{\"Values\":[{\"queryRef\":\"KPI Overall.domain\"},{\"queryRef\":\"KPI Overall.metric_label\"},{\"queryRef\":\"KPI Overall.value\"},{\"queryRef\":\"KPI Overall.owner\"}]},\"prototypeQuery\":{\"Version\":2,\"From\":[{\"Name\":\"t\",\"Entity\":\"KPI Overall\",\"Type\":0}],\"Select\":[{\"Column\":{\"Expression\":{\"SourceRef\":{\"Source\":\"t\"}},\"Property\":\"domain\"},\"Name\":\"KPI Overall.domain\",\"NativeReferenceName\":\"domain\"},{\"Column\":{\"Expression\":{\"SourceRef\":{\"Source\":\"t\"}},\"Property\":\"metric_label\"},\"Name\":\"KPI Overall.metric_label\",\"NativeReferenceName\":\"metric_label\"},{\"Column\":{\"Expression\":{\"SourceRef\":{\"Source\":\"t\"}},\"Property\":\"value\"},\"Name\":\"KPI Overall.value\",\"NativeReferenceName\":\"value\"},{\"Column\":{\"Expression\":{\"SourceRef\":{\"Source\":\"t\"}},\"Property\":\"owner\"},\"Name\":\"KPI Overall.owner\",\"NativeReferenceName\":\"owner\"}]},\"drillFilterOtherVisuals\":true,\"objects\":{},\"vcObjects\":{\"title\":[{\"properties\":{\"show\":{\"expr\":{\"Literal\":{\"Value\":\"true\"}}},\"text\":{\"expr\":{\"Literal\":{\"Value\":\"'Metric layer - all 19 governed definitions'\"}}}}}]}}}",
+          "filters": "[]"
+        },
+        {
+          "x": 16,
+          "y": 318,
+          "z": 0,
+          "width": 296,
+          "height": 386,
+          "config": "{\"name\":\"ov_slicer\",\"layouts\":[{\"id\":0,\"position\":{\"x\":16,\"y\":318,\"z\":0,\"width\":296,\"height\":386}}],\"singleVisual\":{\"visualType\":\"slicer\",\"projections\":{\"Values\":[{\"queryRef\":\"KPI Overall.domain\"}]},\"prototypeQuery\":{\"Version\":2,\"From\":[{\"Name\":\"t\",\"Entity\":\"KPI Overall\",\"Type\":0}],\"Select\":[{\"Column\":{\"Expression\":{\"SourceRef\":{\"Source\":\"t\"}},\"Property\":\"domain\"},\"Name\":\"KPI Overall.domain\",\"NativeReferenceName\":\"domain\"},{\"Column\":{\"Expression\":{\"SourceRef\":{\"Source\":\"t\"}},\"Property\":\"metric_key\"},\"Name\":\"KPI Overall.metric_key\",\"NativeReferenceName\":\"metric_key\"}]},\"drillFilterOtherVisuals\":true,\"objects\":{},\"vcObjects\":{\"title\":[{\"properties\":{\"show\":{\"expr\":{\"Literal\":{\"Value\":\"true\"}}},\"text\":{\"expr\":{\"Literal\":{\"Value\":\"'Domain'\"}}}}}]}}}",
+          "filters": "[]"
+        }
+      ],
+      "config": "{}",
+      "displayOption": 1,
+      "width": 1280,
+      "height": 720
+    },
+    {
+      "name": "pgDaily",
+      "displayName": "Daily trend",
+      "filters": "[]",
+      "ordinal": 1,
+      "visualContainers": [
+        {
+          "x": 16,
+          "y": 16,
+          "z": 0,
+          "width": 616,
+          "height": 332,
+          "config": "{\"name\":\"dt0\",\"layouts\":[{\"id\":0,\"position\":{\"x\":16,\"y\":16,\"z\":0,\"width\":616,\"height\":332}}],\"singleVisual\":{\"visualType\":\"lineChart\",\"projections\":{\"Category\":[{\"queryRef\":\"KPI Daily.calendar_date\"}],\"Y\":[{\"queryRef\":\"Sum(KPI Daily.value)\"}],\"Series\":[{\"queryRef\":\"KPI Daily.metric_key\"}]},\"prototypeQuery\":{\"Version\":2,\"From\":[{\"Name\":\"t\",\"Entity\":\"KPI Daily\",\"Type\":0}],\"Select\":[{\"Column\":{\"Expression\":{\"SourceRef\":{\"Source\":\"t\"}},\"Property\":\"calendar_date\"},\"Name\":\"KPI Daily.calendar_date\",\"NativeReferenceName\":\"calendar_date\"},{\"Aggregation\":{\"Expression\":{\"Column\":{\"Expression\":{\"SourceRef\":{\"Source\":\"t\"}},\"Property\":\"value\"}},\"Function\":0},\"Name\":\"Sum(KPI Daily.value)\",\"NativeReferenceName\":\"value\"},{\"Column\":{\"Expression\":{\"SourceRef\":{\"Source\":\"t\"}},\"Property\":\"metric_key\"},\"Name\":\"KPI Daily.metric_key\",\"NativeReferenceName\":\"metric_key\"}],\"Where\":[{\"Condition\":{\"In\":{\"Expressions\":[{\"Column\":{\"Expression\":{\"SourceRef\":{\"Source\":\"t\"}},\"Property\":\"metric_key\"}}],\"Values\":[[{\"Literal\":{\"Value\":\"'detection_rate'\"}}],[{\"Literal\":{\"Value\":\"'value_detection_rate'\"}}]]}}}]},\"drillFilterOtherVisuals\":true,\"objects\":{},\"vcObjects\":{\"title\":[{\"properties\":{\"show\":{\"expr\":{\"Literal\":{\"Value\":\"true\"}}},\"text\":{\"expr\":{\"Literal\":{\"Value\":\"'Detection'\"}}}}}]}}}",
+          "filters": "[]"
+        },
+        {
+          "x": 648,
+          "y": 16,
+          "z": 0,
+          "width": 616,
+          "height": 332,
+          "config": "{\"name\":\"dt1\",\"layouts\":[{\"id\":0,\"position\":{\"x\":648,\"y\":16,\"z\":0,\"width\":616,\"height\":332}}],\"singleVisual\":{\"visualType\":\"lineChart\",\"projections\":{\"Category\":[{\"queryRef\":\"KPI Daily.calendar_date\"}],\"Y\":[{\"queryRef\":\"Sum(KPI Daily.value)\"}],\"Series\":[{\"queryRef\":\"KPI Daily.metric_key\"}]},\"prototypeQuery\":{\"Version\":2,\"From\":[{\"Name\":\"t\",\"Entity\":\"KPI Daily\",\"Type\":0}],\"Select\":[{\"Column\":{\"Expression\":{\"SourceRef\":{\"Source\":\"t\"}},\"Property\":\"calendar_date\"},\"Name\":\"KPI Daily.calendar_date\",\"NativeReferenceName\":\"calendar_date\"},{\"Aggregation\":{\"Expression\":{\"Column\":{\"Expression\":{\"SourceRef\":{\"Source\":\"t\"}},\"Property\":\"value\"}},\"Function\":0},\"Name\":\"Sum(KPI Daily.value)\",\"NativeReferenceName\":\"value\"},{\"Column\":{\"Expression\":{\"SourceRef\":{\"Source\":\"t\"}},\"Property\":\"metric_key\"},\"Name\":\"KPI Daily.metric_key\",\"NativeReferenceName\":\"metric_key\"}],\"Where\":[{\"Condition\":{\"In\":{\"Expressions\":[{\"Column\":{\"Expression\":{\"SourceRef\":{\"Source\":\"t\"}},\"Property\":\"metric_key\"}}],\"Values\":[[{\"Literal\":{\"Value\":\"'fraud_prevalence_bps'\"}}]]}}}]},\"drillFilterOtherVisuals\":true,\"objects\":{},\"vcObjects\":{\"title\":[{\"properties\":{\"show\":{\"expr\":{\"Literal\":{\"Value\":\"true\"}}},\"text\":{\"expr\":{\"Literal\":{\"Value\":\"'Fraud prevalence'\"}}}}}]}}}",
+          "filters": "[]"
+        },
+        {
+          "x": 16,
+          "y": 364,
+          "z": 0,
+          "width": 616,
+          "height": 332,
+          "config": "{\"name\":\"dt2\",\"layouts\":[{\"id\":0,\"position\":{\"x\":16,\"y\":364,\"z\":0,\"width\":616,\"height\":332}}],\"singleVisual\":{\"visualType\":\"lineChart\",\"projections\":{\"Category\":[{\"queryRef\":\"KPI Daily.calendar_date\"}],\"Y\":[{\"queryRef\":\"Sum(KPI Daily.value)\"}],\"Series\":[{\"queryRef\":\"KPI Daily.metric_key\"}]},\"prototypeQuery\":{\"Version\":2,\"From\":[{\"Name\":\"t\",\"Entity\":\"KPI Daily\",\"Type\":0}],\"Select\":[{\"Column\":{\"Expression\":{\"SourceRef\":{\"Source\":\"t\"}},\"Property\":\"calendar_date\"},\"Name\":\"KPI Daily.calendar_date\",\"NativeReferenceName\":\"calendar_date\"},{\"Aggregation\":{\"Expression\":{\"Column\":{\"Expression\":{\"SourceRef\":{\"Source\":\"t\"}},\"Property\":\"value\"}},\"Function\":0},\"Name\":\"Sum(KPI Daily.value)\",\"NativeReferenceName\":\"value\"},{\"Column\":{\"Expression\":{\"SourceRef\":{\"Source\":\"t\"}},\"Property\":\"metric_key\"},\"Name\":\"KPI Daily.metric_key\",\"NativeReferenceName\":\"metric_key\"}],\"Where\":[{\"Condition\":{\"In\":{\"Expressions\":[{\"Column\":{\"Expression\":{\"SourceRef\":{\"Source\":\"t\"}},\"Property\":\"metric_key\"}}],\"Values\":[[{\"Literal\":{\"Value\":\"'mean_risk_score'\"}}],[{\"Literal\":{\"Value\":\"'high_risk_rate'\"}}]]}}}]},\"drillFilterOtherVisuals\":true,\"objects\":{},\"vcObjects\":{\"title\":[{\"properties\":{\"show\":{\"expr\":{\"Literal\":{\"Value\":\"true\"}}},\"text\":{\"expr\":{\"Literal\":{\"Value\":\"'Model health'\"}}}}}]}}}",
+          "filters": "[]"
+        },
+        {
+          "x": 648,
+          "y": 364,
+          "z": 0,
+          "width": 616,
+          "height": 332,
+          "config": "{\"name\":\"dt3\",\"layouts\":[{\"id\":0,\"position\":{\"x\":648,\"y\":364,\"z\":0,\"width\":616,\"height\":332}}],\"singleVisual\":{\"visualType\":\"lineChart\",\"projections\":{\"Category\":[{\"queryRef\":\"KPI Daily.calendar_date\"}],\"Y\":[{\"queryRef\":\"Sum(KPI Daily.value)\"}],\"Series\":[{\"queryRef\":\"KPI Daily.metric_key\"}]},\"prototypeQuery\":{\"Version\":2,\"From\":[{\"Name\":\"t\",\"Entity\":\"KPI Daily\",\"Type\":0}],\"Select\":[{\"Column\":{\"Expression\":{\"SourceRef\":{\"Source\":\"t\"}},\"Property\":\"calendar_date\"},\"Name\":\"KPI Daily.calendar_date\",\"NativeReferenceName\":\"calendar_date\"},{\"Aggregation\":{\"Expression\":{\"Column\":{\"Expression\":{\"SourceRef\":{\"Source\":\"t\"}},\"Property\":\"value\"}},\"Function\":0},\"Name\":\"Sum(KPI Daily.value)\",\"NativeReferenceName\":\"value\"},{\"Column\":{\"Expression\":{\"SourceRef\":{\"Source\":\"t\"}},\"Property\":\"metric_key\"},\"Name\":\"KPI Daily.metric_key\",\"NativeReferenceName\":\"metric_key\"}],\"Where\":[{\"Condition\":{\"In\":{\"Expressions\":[{\"Column\":{\"Expression\":{\"SourceRef\":{\"Source\":\"t\"}},\"Property\":\"metric_key\"}}],\"Values\":[[{\"Literal\":{\"Value\":\"'decline_rate'\"}}],[{\"Literal\":{\"Value\":\"'challenge_rate'\"}}],[{\"Literal\":{\"Value\":\"'review_rate'\"}}]]}}}]},\"drillFilterOtherVisuals\":true,\"objects\":{},\"vcObjects\":{\"title\":[{\"properties\":{\"show\":{\"expr\":{\"Literal\":{\"Value\":\"true\"}}},\"text\":{\"expr\":{\"Literal\":{\"Value\":\"'Decision mix'\"}}}}}]}}}",
+          "filters": "[]"
+        }
+      ],
+      "config": "{}",
+      "displayOption": 1,
+      "width": 1280,
+      "height": 720
+    },
+    {
+      "name": "pgThreshold",
+      "displayName": "Threshold economics",
+      "filters": "[]",
+      "ordinal": 2,
+      "visualContainers": [
+        {
+          "x": 16,
+          "y": 16,
+          "z": 0,
+          "width": 296,
+          "height": 200,
+          "config": "{\"name\":\"th_slicer\",\"layouts\":[{\"id\":0,\"position\":{\"x\":16,\"y\":16,\"z\":0,\"width\":296,\"height\":200}}],\"singleVisual\":{\"visualType\":\"slicer\",\"projections\":{\"Values\":[{\"queryRef\":\"Threshold Frontier.decline_threshold\"}]},\"prototypeQuery\":{\"Version\":2,\"From\":[{\"Name\":\"t\",\"Entity\":\"Threshold Frontier\",\"Type\":0}],\"Select\":[{\"Column\":{\"Expression\":{\"SourceRef\":{\"Source\":\"t\"}},\"Property\":\"decline_threshold\"},\"Name\":\"Threshold Frontier.decline_threshold\",\"NativeReferenceName\":\"decline_threshold\"}]},\"drillFilterOtherVisuals\":true,\"objects\":{},\"vcObjects\":{\"title\":[{\"properties\":{\"show\":{\"expr\":{\"Literal\":{\"Value\":\"true\"}}},\"text\":{\"expr\":{\"Literal\":{\"Value\":\"'Decline threshold'\"}}}}}]}}}",
+          "filters": "[]"
+        },
+        {
+          "x": 16,
+          "y": 232,
+          "z": 0,
+          "width": 144,
+          "height": 112,
+          "config": "{\"name\":\"th_c0\",\"layouts\":[{\"id\":0,\"position\":{\"x\":16,\"y\":232,\"z\":0,\"width\":144,\"height\":112}}],\"singleVisual\":{\"visualType\":\"card\",\"projections\":{\"Values\":[{\"queryRef\":\"Threshold Frontier.Net benefit\"}]},\"prototypeQuery\":{\"Version\":2,\"From\":[{\"Name\":\"t\",\"Entity\":\"Threshold Frontier\",\"Type\":0}],\"Select\":[{\"Measure\":{\"Expression\":{\"SourceRef\":{\"Source\":\"t\"}},\"Property\":\"Net benefit\"},\"Name\":\"Threshold Frontier.Net benefit\",\"NativeReferenceName\":\"Net benefit\"}]},\"drillFilterOtherVisuals\":true,\"objects\":{},\"vcObjects\":{\"title\":[{\"properties\":{\"show\":{\"expr\":{\"Literal\":{\"Value\":\"true\"}}},\"text\":{\"expr\":{\"Literal\":{\"Value\":\"'Net benefit'\"}}}}}]}}}",
+          "filters": "[]"
+        },
+        {
+          "x": 168,
+          "y": 232,
+          "z": 0,
+          "width": 144,
+          "height": 112,
+          "config": "{\"name\":\"th_c1\",\"layouts\":[{\"id\":0,\"position\":{\"x\":168,\"y\":232,\"z\":0,\"width\":144,\"height\":112}}],\"singleVisual\":{\"visualType\":\"card\",\"projections\":{\"Values\":[{\"queryRef\":\"Threshold Frontier.Net benefit vs production\"}]},\"prototypeQuery\":{\"Version\":2,\"From\":[{\"Name\":\"t\",\"Entity\":\"Threshold Frontier\",\"Type\":0}],\"Select\":[{\"Measure\":{\"Expression\":{\"SourceRef\":{\"Source\":\"t\"}},\"Property\":\"Net benefit vs production\"},\"Name\":\"Threshold Frontier.Net benefit vs production\",\"NativeReferenceName\":\"Net benefit vs production\"}]},\"drillFilterOtherVisuals\":true,\"objects\":{},\"vcObjects\":{\"title\":[{\"properties\":{\"show\":{\"expr\":{\"Literal\":{\"Value\":\"true\"}}},\"text\":{\"expr\":{\"Literal\":{\"Value\":\"'vs production (0.86)'\"}}}}}]}}}",
+          "filters": "[]"
+        },
+        {
+          "x": 16,
+          "y": 352,
+          "z": 0,
+          "width": 144,
+          "height": 112,
+          "config": "{\"name\":\"th_c2\",\"layouts\":[{\"id\":0,\"position\":{\"x\":16,\"y\":352,\"z\":0,\"width\":144,\"height\":112}}],\"singleVisual\":{\"visualType\":\"card\",\"projections\":{\"Values\":[{\"queryRef\":\"Threshold Frontier.Frontier value detection\"}]},\"prototypeQuery\":{\"Version\":2,\"From\":[{\"Name\":\"t\",\"Entity\":\"Threshold Frontier\",\"Type\":0}],\"Select\":[{\"Measure\":{\"Expression\":{\"SourceRef\":{\"Source\":\"t\"}},\"Property\":\"Frontier value detection\"},\"Name\":\"Threshold Frontier.Frontier value detection\",\"NativeReferenceName\":\"Frontier value detection\"}]},\"drillFilterOtherVisuals\":true,\"objects\":{},\"vcObjects\":{\"title\":[{\"properties\":{\"show\":{\"expr\":{\"Literal\":{\"Value\":\"true\"}}},\"text\":{\"expr\":{\"Literal\":{\"Value\":\"'Value detection'\"}}}}}]}}}",
+          "filters": "[]"
+        },
+        {
+          "x": 168,
+          "y": 352,
+          "z": 0,
+          "width": 144,
+          "height": 112,
+          "config": "{\"name\":\"th_c3\",\"layouts\":[{\"id\":0,\"position\":{\"x\":168,\"y\":352,\"z\":0,\"width\":144,\"height\":112}}],\"singleVisual\":{\"visualType\":\"card\",\"projections\":{\"Values\":[{\"queryRef\":\"Threshold Frontier.Frontier precision\"}]},\"prototypeQuery\":{\"Version\":2,\"From\":[{\"Name\":\"t\",\"Entity\":\"Threshold Frontier\",\"Type\":0}],\"Select\":[{\"Measure\":{\"Expression\":{\"SourceRef\":{\"Source\":\"t\"}},\"Property\":\"Frontier precision\"},\"Name\":\"Threshold Frontier.Frontier precision\",\"NativeReferenceName\":\"Frontier precision\"}]},\"drillFilterOtherVisuals\":true,\"objects\":{},\"vcObjects\":{\"title\":[{\"properties\":{\"show\":{\"expr\":{\"Literal\":{\"Value\":\"true\"}}},\"text\":{\"expr\":{\"Literal\":{\"Value\":\"'Decline precision'\"}}}}}]}}}",
+          "filters": "[]"
+        },
+        {
+          "x": 16,
+          "y": 472,
+          "z": 0,
+          "width": 144,
+          "height": 112,
+          "config": "{\"name\":\"th_c4\",\"layouts\":[{\"id\":0,\"position\":{\"x\":16,\"y\":472,\"z\":0,\"width\":144,\"height\":112}}],\"singleVisual\":{\"visualType\":\"card\",\"projections\":{\"Values\":[{\"queryRef\":\"Threshold Frontier.Frontier false declines\"}]},\"prototypeQuery\":{\"Version\":2,\"From\":[{\"Name\":\"t\",\"Entity\":\"Threshold Frontier\",\"Type\":0}],\"Select\":[{\"Measure\":{\"Expression\":{\"SourceRef\":{\"Source\":\"t\"}},\"Property\":\"Frontier false declines\"},\"Name\":\"Threshold Frontier.Frontier false declines\",\"NativeReferenceName\":\"Frontier false declines\"}]},\"drillFilterOtherVisuals\":true,\"objects\":{},\"vcObjects\":{\"title\":[{\"properties\":{\"show\":{\"expr\":{\"Literal\":{\"Value\":\"true\"}}},\"text\":{\"expr\":{\"Literal\":{\"Value\":\"'False declines'\"}}}}}]}}}",
+          "filters": "[]"
+        },
+        {
+          "x": 168,
+          "y": 472,
+          "z": 0,
+          "width": 144,
+          "height": 112,
+          "config": "{\"name\":\"th_c5\",\"layouts\":[{\"id\":0,\"position\":{\"x\":168,\"y\":472,\"z\":0,\"width\":144,\"height\":112}}],\"singleVisual\":{\"visualType\":\"card\",\"projections\":{\"Values\":[{\"queryRef\":\"Threshold Frontier.Frontier alerts per 10k\"}]},\"prototypeQuery\":{\"Version\":2,\"From\":[{\"Name\":\"t\",\"Entity\":\"Threshold Frontier\",\"Type\":0}],\"Select\":[{\"Measure\":{\"Expression\":{\"SourceRef\":{\"Source\":\"t\"}},\"Property\":\"Frontier alerts per 10k\"},\"Name\":\"Threshold Frontier.Frontier alerts per 10k\",\"NativeReferenceName\":\"Frontier alerts per 10k\"}]},\"drillFilterOtherVisuals\":true,\"objects\":{},\"vcObjects\":{\"title\":[{\"properties\":{\"show\":{\"expr\":{\"Literal\":{\"Value\":\"true\"}}},\"text\":{\"expr\":{\"Literal\":{\"Value\":\"'Alerts per 10k'\"}}}}}]}}}",
+          "filters": "[]"
+        },
+        {
+          "x": 328,
+          "y": 16,
+          "z": 0,
+          "width": 936,
+          "height": 400,
+          "config": "{\"name\":\"th_line\",\"layouts\":[{\"id\":0,\"position\":{\"x\":328,\"y\":16,\"z\":0,\"width\":936,\"height\":400}}],\"singleVisual\":{\"visualType\":\"lineChart\",\"projections\":{\"Category\":[{\"queryRef\":\"Threshold Frontier.decline_threshold\"}],\"Y\":[{\"queryRef\":\"Sum(Threshold Frontier.net_benefit)\"}]},\"prototypeQuery\":{\"Version\":2,\"From\":[{\"Name\":\"t\",\"Entity\":\"Threshold Frontier\",\"Type\":0}],\"Select\":[{\"Column\":{\"Expression\":{\"SourceRef\":{\"Source\":\"t\"}},\"Property\":\"decline_threshold\"},\"Name\":\"Threshold Frontier.decline_threshold\",\"NativeReferenceName\":\"decline_threshold\"},{\"Aggregation\":{\"Expression\":{\"Column\":{\"Expression\":{\"SourceRef\":{\"Source\":\"t\"}},\"Property\":\"net_benefit\"}},\"Function\":0},\"Name\":\"Sum(Threshold Frontier.net_benefit)\",\"NativeReferenceName\":\"net_benefit\"}]},\"drillFilterOtherVisuals\":true,\"objects\":{},\"vcObjects\":{\"title\":[{\"properties\":{\"show\":{\"expr\":{\"Literal\":{\"Value\":\"true\"}}},\"text\":{\"expr\":{\"Literal\":{\"Value\":\"'Net benefit across all 95 candidate thresholds'\"}}}}}]}}}",
+          "filters": "[]"
+        },
+        {
+          "x": 328,
+          "y": 432,
+          "z": 0,
+          "width": 936,
+          "height": 272,
+          "config": "{\"name\":\"th_tbl\",\"layouts\":[{\"id\":0,\"position\":{\"x\":328,\"y\":432,\"z\":0,\"width\":936,\"height\":272}}],\"singleVisual\":{\"visualType\":\"tableEx\",\"projections\":{\"Values\":[{\"queryRef\":\"Threshold Frontier.decline_threshold\"},{\"queryRef\":\"Threshold Frontier.detection_rate\"},{\"queryRef\":\"Threshold Frontier.value_detection_rate\"},{\"queryRef\":\"Threshold Frontier.precision\"},{\"queryRef\":\"Threshold Frontier.false_declines\"},{\"queryRef\":\"Threshold Frontier.alerts_per_10k_score_only\"},{\"queryRef\":\"Threshold Frontier.net_benefit\"}]},\"prototypeQuery\":{\"Version\":2,\"From\":[{\"Name\":\"t\",\"Entity\":\"Threshold Frontier\",\"Type\":0}],\"Select\":[{\"Column\":{\"Expression\":{\"SourceRef\":{\"Source\":\"t\"}},\"Property\":\"decline_threshold\"},\"Name\":\"Threshold Frontier.decline_threshold\",\"NativeReferenceName\":\"decline_threshold\"},{\"Column\":{\"Expression\":{\"SourceRef\":{\"Source\":\"t\"}},\"Property\":\"detection_rate\"},\"Name\":\"Threshold Frontier.detection_rate\",\"NativeReferenceName\":\"detection_rate\"},{\"Column\":{\"Expression\":{\"SourceRef\":{\"Source\":\"t\"}},\"Property\":\"value_detection_rate\"},\"Name\":\"Threshold Frontier.value_detection_rate\",\"NativeReferenceName\":\"value_detection_rate\"},{\"Column\":{\"Expression\":{\"SourceRef\":{\"Source\":\"t\"}},\"Property\":\"precision\"},\"Name\":\"Threshold Frontier.precision\",\"NativeReferenceName\":\"precision\"},{\"Column\":{\"Expression\":{\"SourceRef\":{\"Source\":\"t\"}},\"Property\":\"false_declines\"},\"Name\":\"Threshold Frontier.false_declines\",\"NativeReferenceName\":\"false_declines\"},{\"Column\":{\"Expression\":{\"SourceRef\":{\"Source\":\"t\"}},\"Property\":\"alerts_per_10k_score_only\"},\"Name\":\"Threshold Frontier.alerts_per_10k_score_only\",\"NativeReferenceName\":\"alerts_per_10k_score_only\"},{\"Column\":{\"Expression\":{\"SourceRef\":{\"Source\":\"t\"}},\"Property\":\"net_benefit\"},\"Name\":\"Threshold Frontier.net_benefit\",\"NativeReferenceName\":\"net_benefit\"}]},\"drillFilterOtherVisuals\":true,\"objects\":{},\"vcObjects\":{\"title\":[{\"properties\":{\"show\":{\"expr\":{\"Literal\":{\"Value\":\"true\"}}},\"text\":{\"expr\":{\"Literal\":{\"Value\":\"'Frontier detail'\"}}}}}]}}}",
+          "filters": "[]"
+        }
+      ],
+      "config": "{}",
+      "displayOption": 1,
+      "width": 1280,
+      "height": 720
+    },
+    {
+      "name": "pgSegments",
+      "displayName": "Segments",
+      "filters": "[]",
+      "ordinal": 3,
+      "visualContainers": [
+        {
+          "x": 16,
+          "y": 16,
+          "z": 0,
+          "width": 616,
+          "height": 420,
+          "config": "{\"name\":\"sg0\",\"layouts\":[{\"id\":0,\"position\":{\"x\":16,\"y\":16,\"z\":0,\"width\":616,\"height\":420}}],\"singleVisual\":{\"visualType\":\"barChart\",\"projections\":{\"Category\":[{\"queryRef\":\"Segment Merchant Category.segment_value\"}],\"Y\":[{\"queryRef\":\"Sum(Segment Merchant Category.fraud_prevalence_bps)\"}]},\"prototypeQuery\":{\"Version\":2,\"From\":[{\"Name\":\"t\",\"Entity\":\"Segment Merchant Category\",\"Type\":0}],\"Select\":[{\"Column\":{\"Expression\":{\"SourceRef\":{\"Source\":\"t\"}},\"Property\":\"segment_value\"},\"Name\":\"Segment Merchant Category.segment_value\",\"NativeReferenceName\":\"segment_value\"},{\"Aggregation\":{\"Expression\":{\"Column\":{\"Expression\":{\"SourceRef\":{\"Source\":\"t\"}},\"Property\":\"fraud_prevalence_bps\"}},\"Function\":0},\"Name\":\"Sum(Segment Merchant Category.fraud_prevalence_bps)\",\"NativeReferenceName\":\"fraud_prevalence_bps\"}]},\"drillFilterOtherVisuals\":true,\"objects\":{},\"vcObjects\":{\"title\":[{\"properties\":{\"show\":{\"expr\":{\"Literal\":{\"Value\":\"true\"}}},\"text\":{\"expr\":{\"Literal\":{\"Value\":\"'Fraud prevalence (bps) - where fraud concentrates'\"}}}}}]}}}",
+          "filters": "[]"
+        },
+        {
+          "x": 648,
+          "y": 16,
+          "z": 0,
+          "width": 616,
+          "height": 420,
+          "config": "{\"name\":\"sg1\",\"layouts\":[{\"id\":0,\"position\":{\"x\":648,\"y\":16,\"z\":0,\"width\":616,\"height\":420}}],\"singleVisual\":{\"visualType\":\"barChart\",\"projections\":{\"Category\":[{\"queryRef\":\"Segment Merchant Category.segment_value\"}],\"Y\":[{\"queryRef\":\"Sum(Segment Merchant Category.value_detection_rate)\"}]},\"prototypeQuery\":{\"Version\":2,\"From\":[{\"Name\":\"t\",\"Entity\":\"Segment Merchant Category\",\"Type\":0}],\"Select\":[{\"Column\":{\"Expression\":{\"SourceRef\":{\"Source\":\"t\"}},\"Property\":\"segment_value\"},\"Name\":\"Segment Merchant Category.segment_value\",\"NativeReferenceName\":\"segment_value\"},{\"Aggregation\":{\"Expression\":{\"Column\":{\"Expression\":{\"SourceRef\":{\"Source\":\"t\"}},\"Property\":\"value_detection_rate\"}},\"Function\":0},\"Name\":\"Sum(Segment Merchant Category.value_detection_rate)\",\"NativeReferenceName\":\"value_detection_rate\"}]},\"drillFilterOtherVisuals\":true,\"objects\":{},\"vcObjects\":{\"title\":[{\"properties\":{\"show\":{\"expr\":{\"Literal\":{\"Value\":\"true\"}}},\"text\":{\"expr\":{\"Literal\":{\"Value\":\"'Value detection rate - how much of it we stop'\"}}}}}]}}}",
+          "filters": "[]"
+        },
+        {
+          "x": 16,
+          "y": 452,
+          "z": 0,
+          "width": 1248,
+          "height": 252,
+          "config": "{\"name\":\"sg_tbl\",\"layouts\":[{\"id\":0,\"position\":{\"x\":16,\"y\":452,\"z\":0,\"width\":1248,\"height\":252}}],\"singleVisual\":{\"visualType\":\"tableEx\",\"projections\":{\"Values\":[{\"queryRef\":\"Segment Merchant Category.segment_value\"},{\"queryRef\":\"Segment Merchant Category.authorizations\"},{\"queryRef\":\"Segment Merchant Category.attempted_spend\"},{\"queryRef\":\"Segment Merchant Category.fraud_prevalence_bps\"},{\"queryRef\":\"Segment Merchant Category.detection_rate\"},{\"queryRef\":\"Segment Merchant Category.value_detection_rate\"},{\"queryRef\":\"Segment Merchant Category.false_decline_rate\"}]},\"prototypeQuery\":{\"Version\":2,\"From\":[{\"Name\":\"t\",\"Entity\":\"Segment Merchant Category\",\"Type\":0}],\"Select\":[{\"Column\":{\"Expression\":{\"SourceRef\":{\"Source\":\"t\"}},\"Property\":\"segment_value\"},\"Name\":\"Segment Merchant Category.segment_value\",\"NativeReferenceName\":\"segment_value\"},{\"Column\":{\"Expression\":{\"SourceRef\":{\"Source\":\"t\"}},\"Property\":\"authorizations\"},\"Name\":\"Segment Merchant Category.authorizations\",\"NativeReferenceName\":\"authorizations\"},{\"Column\":{\"Expression\":{\"SourceRef\":{\"Source\":\"t\"}},\"Property\":\"attempted_spend\"},\"Name\":\"Segment Merchant Category.attempted_spend\",\"NativeReferenceName\":\"attempted_spend\"},{\"Column\":{\"Expression\":{\"SourceRef\":{\"Source\":\"t\"}},\"Property\":\"fraud_prevalence_bps\"},\"Name\":\"Segment Merchant Category.fraud_prevalence_bps\",\"NativeReferenceName\":\"fraud_prevalence_bps\"},{\"Column\":{\"Expression\":{\"SourceRef\":{\"Source\":\"t\"}},\"Property\":\"detection_rate\"},\"Name\":\"Segment Merchant Category.detection_rate\",\"NativeReferenceName\":\"detection_rate\"},{\"Column\":{\"Expression\":{\"SourceRef\":{\"Source\":\"t\"}},\"Property\":\"value_detection_rate\"},\"Name\":\"Segment Merchant Category.value_detection_rate\",\"NativeReferenceName\":\"value_detection_rate\"},{\"Column\":{\"Expression\":{\"SourceRef\":{\"Source\":\"t\"}},\"Property\":\"false_decline_rate\"},\"Name\":\"Segment Merchant Category.false_decline_rate\",\"NativeReferenceName\":\"false_decline_rate\"}]},\"drillFilterOtherVisuals\":true,\"objects\":{},\"vcObjects\":{\"title\":[{\"properties\":{\"show\":{\"expr\":{\"Literal\":{\"Value\":\"true\"}}},\"text\":{\"expr\":{\"Literal\":{\"Value\":\"'Merchant category detail'\"}}}}}]}}}",
+          "filters": "[]"
+        }
+      ],
+      "config": "{}",
+      "displayOption": 1,
+      "width": 1280,
+      "height": 720
+    },
+    {
+      "name": "pgQuality",
+      "displayName": "Data quality",
+      "filters": "[]",
+      "ordinal": 4,
+      "visualContainers": [
+        {
+          "x": 16,
+          "y": 16,
+          "z": 0,
+          "width": 1248,
+          "height": 560,
+          "config": "{\"name\":\"dq_tbl\",\"layouts\":[{\"id\":0,\"position\":{\"x\":16,\"y\":16,\"z\":0,\"width\":1248,\"height\":560}}],\"singleVisual\":{\"visualType\":\"tableEx\",\"projections\":{\"Values\":[{\"queryRef\":\"Data Quality.dimension\"},{\"queryRef\":\"Data Quality.check\"},{\"queryRef\":\"Data Quality.severity\"},{\"queryRef\":\"Data Quality.measured\"},{\"queryRef\":\"Data Quality.threshold\"},{\"queryRef\":\"Data Quality.blocks_publication\"},{\"queryRef\":\"Data Quality.detail\"}]},\"prototypeQuery\":{\"Version\":2,\"From\":[{\"Name\":\"t\",\"Entity\":\"Data Quality\",\"Type\":0}],\"Select\":[{\"Column\":{\"Expression\":{\"SourceRef\":{\"Source\":\"t\"}},\"Property\":\"dimension\"},\"Name\":\"Data Quality.dimension\",\"NativeReferenceName\":\"dimension\"},{\"Column\":{\"Expression\":{\"SourceRef\":{\"Source\":\"t\"}},\"Property\":\"check\"},\"Name\":\"Data Quality.check\",\"NativeReferenceName\":\"check\"},{\"Column\":{\"Expression\":{\"SourceRef\":{\"Source\":\"t\"}},\"Property\":\"severity\"},\"Name\":\"Data Quality.severity\",\"NativeReferenceName\":\"severity\"},{\"Column\":{\"Expression\":{\"SourceRef\":{\"Source\":\"t\"}},\"Property\":\"measured\"},\"Name\":\"Data Quality.measured\",\"NativeReferenceName\":\"measured\"},{\"Column\":{\"Expression\":{\"SourceRef\":{\"Source\":\"t\"}},\"Property\":\"threshold\"},\"Name\":\"Data Quality.threshold\",\"NativeReferenceName\":\"threshold\"},{\"Column\":{\"Expression\":{\"SourceRef\":{\"Source\":\"t\"}},\"Property\":\"blocks_publication\"},\"Name\":\"Data Quality.blocks_publication\",\"NativeReferenceName\":\"blocks_publication\"},{\"Column\":{\"Expression\":{\"SourceRef\":{\"Source\":\"t\"}},\"Property\":\"detail\"},\"Name\":\"Data Quality.detail\",\"NativeReferenceName\":\"detail\"}]},\"drillFilterOtherVisuals\":true,\"objects\":{},\"vcObjects\":{\"title\":[{\"properties\":{\"show\":{\"expr\":{\"Literal\":{\"Value\":\"true\"}}},\"text\":{\"expr\":{\"Literal\":{\"Value\":\"'17 checks - a blocking failure aborts the refresh'\"}}}}}]}}}",
+          "filters": "[]"
+        },
+        {
+          "x": 16,
+          "y": 592,
+          "z": 0,
+          "width": 1248,
+          "height": 112,
+          "config": "{\"name\":\"dq_card\",\"layouts\":[{\"id\":0,\"position\":{\"x\":16,\"y\":592,\"z\":0,\"width\":1248,\"height\":112}}],\"singleVisual\":{\"visualType\":\"multiRowCard\",\"projections\":{\"Values\":[{\"queryRef\":\"Data Quality.Checks passing\"},{\"queryRef\":\"Data Quality.Checks total\"},{\"queryRef\":\"Data Quality.Publishable\"}]},\"prototypeQuery\":{\"Version\":2,\"From\":[{\"Name\":\"t\",\"Entity\":\"Data Quality\",\"Type\":0}],\"Select\":[{\"Measure\":{\"Expression\":{\"SourceRef\":{\"Source\":\"t\"}},\"Property\":\"Checks passing\"},\"Name\":\"Data Quality.Checks passing\",\"NativeReferenceName\":\"Checks passing\"},{\"Measure\":{\"Expression\":{\"SourceRef\":{\"Source\":\"t\"}},\"Property\":\"Checks total\"},\"Name\":\"Data Quality.Checks total\",\"NativeReferenceName\":\"Checks total\"},{\"Measure\":{\"Expression\":{\"SourceRef\":{\"Source\":\"t\"}},\"Property\":\"Publishable\"},\"Name\":\"Data Quality.Publishable\",\"NativeReferenceName\":\"Publishable\"}]},\"drillFilterOtherVisuals\":true,\"objects\":{},\"vcObjects\":{\"title\":[{\"properties\":{\"show\":{\"expr\":{\"Literal\":{\"Value\":\"true\"}}},\"text\":{\"expr\":{\"Literal\":{\"Value\":\"'Gate status'\"}}}}}]}}}",
+          "filters": "[]"
+        }
+      ],
+      "config": "{}",
+      "displayOption": 1,
+      "width": 1280,
+      "height": 720
+    }
+  ],
+  "filters": "[]"
+}

@@ -1,0 +1,206 @@
+table 'Threshold Frontier'
+	lineageTag: 7fe6902c-869c-577b-99af-ce19e261c523
+
+	measure 'Selected threshold' = SELECTEDVALUE('Threshold Frontier'[decline_threshold])
+		formatString: 0.00
+		lineageTag: 06b3e6c1-55e8-53dd-9226-d1cb7e054a5c
+		displayFolder: Operating point
+
+	measure 'Net benefit' = SUM('Threshold Frontier'[net_benefit])
+		formatString: #,0
+		lineageTag: 00daaefe-8cfc-53ee-a9b3-710e62dd553b
+		displayFolder: Operating point
+
+	measure 'Net benefit at production' = CALCULATE(SUM('Threshold Frontier'[net_benefit]), ALL('Threshold Frontier'), 'Threshold Frontier'[decline_threshold] = 0.85)
+		formatString: #,0
+		lineageTag: b5ab0ba1-4d04-53ed-aa20-ab7b2e6d9eb0
+		displayFolder: Operating point
+		description: 0.85 is the swept point nearest the production threshold of 0.86.
+
+	measure 'Net benefit vs production' = [Net benefit] - [Net benefit at production]
+		formatString: +#,0;-#,0;0
+		lineageTag: cc468075-a97a-52d5-920a-07b9f2c5568e
+		displayFolder: Operating point
+
+	measure 'Frontier detection rate' = SUM('Threshold Frontier'[detection_rate])
+		formatString: 0.0%
+		lineageTag: 4076f421-deaa-59da-adc0-f51dd769a85f
+		displayFolder: Operating point
+
+	measure 'Frontier value detection' = SUM('Threshold Frontier'[value_detection_rate])
+		formatString: 0.0%
+		lineageTag: 272c6c0d-cf5b-52c4-a943-fc6198fdbdc9
+		displayFolder: Operating point
+
+	measure 'Frontier precision' = SUM('Threshold Frontier'[precision])
+		formatString: 0.0%
+		lineageTag: a78a538e-c044-5060-93d9-ea28c4b4fc72
+		displayFolder: Operating point
+
+	measure 'Frontier false declines' = SUM('Threshold Frontier'[false_declines])
+		formatString: #,0
+		lineageTag: 6c987aca-7159-5c6f-b04b-be1aadbf5fc6
+		displayFolder: Operating point
+
+	measure 'Frontier alerts per 10k' = SUM('Threshold Frontier'[alerts_per_10k_score_only])
+		formatString: #,0.0
+		lineageTag: a7acc8c4-e8cf-577d-b7dd-4890106b7970
+		displayFolder: Operating point
+		description: Score-only alert load. Distinct from the alerts_per_10k KPI, which counts the realised queue including rule escalations.
+
+	column decline_threshold
+		dataType: double
+		lineageTag: 9176df1b-87b0-580a-aee8-417ed9213b35
+		summarizeBy: sum
+		sourceColumn: decline_threshold
+
+		annotation SummarizationSetBy = Automatic
+
+	column review_threshold
+		dataType: double
+		lineageTag: a3634c73-f413-5068-813d-76a34e1d0bc8
+		summarizeBy: sum
+		sourceColumn: review_threshold
+
+		annotation SummarizationSetBy = Automatic
+
+	column declines
+		dataType: double
+		lineageTag: db462cfe-2531-5d9f-883e-ebeb7ab94269
+		summarizeBy: sum
+		sourceColumn: declines
+
+		annotation SummarizationSetBy = Automatic
+
+	column reviews
+		dataType: double
+		lineageTag: 320b8561-8ff9-5989-b4c4-15390bf392c6
+		summarizeBy: sum
+		sourceColumn: reviews
+
+		annotation SummarizationSetBy = Automatic
+
+	column caught_fraud
+		dataType: double
+		lineageTag: ba701268-bd30-5796-9ea6-ca49de9e498e
+		summarizeBy: sum
+		sourceColumn: caught_fraud
+
+		annotation SummarizationSetBy = Automatic
+
+	column missed_fraud
+		dataType: double
+		lineageTag: 1b59c090-aa7e-5bba-9fda-0042ab5ee2d2
+		summarizeBy: sum
+		sourceColumn: missed_fraud
+
+		annotation SummarizationSetBy = Automatic
+
+	column false_declines
+		dataType: double
+		lineageTag: e0895183-f595-59b1-b7ed-602222674eb0
+		summarizeBy: sum
+		sourceColumn: false_declines
+
+		annotation SummarizationSetBy = Automatic
+
+	column detection_rate
+		dataType: double
+		lineageTag: ca7515ff-4cd5-5060-8436-315c4a6d97e2
+		summarizeBy: sum
+		sourceColumn: detection_rate
+
+		annotation SummarizationSetBy = Automatic
+
+	column value_detection_rate
+		dataType: double
+		lineageTag: 0d212e76-1f2e-5992-aa71-207a646dc89f
+		summarizeBy: sum
+		sourceColumn: value_detection_rate
+
+		annotation SummarizationSetBy = Automatic
+
+	column precision
+		dataType: double
+		lineageTag: dc65a408-bccf-5236-baac-d53b03527cf4
+		summarizeBy: sum
+		sourceColumn: precision
+
+		annotation SummarizationSetBy = Automatic
+
+	column false_decline_rate
+		dataType: double
+		lineageTag: 09b80622-914b-5799-9b58-1f478d4eea54
+		summarizeBy: sum
+		sourceColumn: false_decline_rate
+
+		annotation SummarizationSetBy = Automatic
+
+	column alerts_per_10k_score_only
+		dataType: double
+		lineageTag: c15b0a66-8025-5aef-92a8-b0efb029cfff
+		summarizeBy: sum
+		sourceColumn: alerts_per_10k_score_only
+
+		annotation SummarizationSetBy = Automatic
+
+	column fraud_value_stopped
+		dataType: double
+		lineageTag: bca02c5f-8b60-5c18-b9d4-58e1b17dc0d7
+		summarizeBy: sum
+		sourceColumn: fraud_value_stopped
+
+		annotation SummarizationSetBy = Automatic
+
+	column fraud_value_lost
+		dataType: double
+		lineageTag: 65047c6c-26ad-50eb-97f3-29957bce2975
+		summarizeBy: sum
+		sourceColumn: fraud_value_lost
+
+		annotation SummarizationSetBy = Automatic
+
+	column gross_benefit
+		dataType: double
+		lineageTag: 173b3346-6cb6-5c19-b666-ed3f5cec300a
+		summarizeBy: sum
+		sourceColumn: gross_benefit
+
+		annotation SummarizationSetBy = Automatic
+
+	column false_decline_cost
+		dataType: double
+		lineageTag: 215aaf9e-6791-5ee2-926f-4949e393167e
+		summarizeBy: sum
+		sourceColumn: false_decline_cost
+
+		annotation SummarizationSetBy = Automatic
+
+	column review_cost
+		dataType: double
+		lineageTag: 2b21e997-6308-55b8-aada-eb267debe1f0
+		summarizeBy: sum
+		sourceColumn: review_cost
+
+		annotation SummarizationSetBy = Automatic
+
+	column net_benefit
+		dataType: double
+		lineageTag: b40edcb0-d912-5a14-98aa-96021610aad1
+		summarizeBy: sum
+		sourceColumn: net_benefit
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'Threshold Frontier' = m
+		mode: import
+		source =
+				let
+				    Source = Csv.Document(File.Contents(ExtractsFolder & "/threshold_frontier.csv"),
+				        [Delimiter = ",", Encoding = 65001, QuoteStyle = QuoteStyle.Csv]),
+				    Promoted = Table.PromoteHeaders(Source, [PromoteAllScalars = true]),
+				    Typed = Table.TransformColumnTypes(Promoted, {{"decline_threshold", type number}, {"review_threshold", type number}, {"declines", type number}, {"reviews", type number}, {"caught_fraud", type number}, {"missed_fraud", type number}, {"false_declines", type number}, {"detection_rate", type number}, {"value_detection_rate", type number}, {"precision", type number}, {"false_decline_rate", type number}, {"alerts_per_10k_score_only", type number}, {"fraud_value_stopped", type number}, {"fraud_value_lost", type number}, {"gross_benefit", type number}, {"false_decline_cost", type number}, {"review_cost", type number}, {"net_benefit", type number}})
+				in
+				    Typed
+
+	annotation PBI_ResultType = Table

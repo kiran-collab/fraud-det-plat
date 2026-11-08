@@ -44,8 +44,12 @@ analytics: ## Build marts, KPIs, threshold economics and BI extracts
 table: ## Export a ready-to-train feature table
 	$(PY) scripts/export_training_table.py
 
+.PHONY: bi
+bi: ## Regenerate the Power BI and Spotfire front ends from the extracts
+	$(PY) scripts/build_bi_projects.py --clean
+
 .PHONY: all
-all: train export index governance analytics ## Full pipeline from scratch
+all: train export index governance analytics bi ## Full pipeline from scratch
 
 # --- run -----------------------------------------------------------------
 .PHONY: serve

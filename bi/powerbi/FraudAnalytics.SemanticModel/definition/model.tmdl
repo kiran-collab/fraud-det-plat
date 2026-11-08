@@ -1,0 +1,27 @@
+model Model
+	culture: en-GB
+	defaultPowerBIDataSourceVersion: powerBI_V3
+	sourceQueryCulture: en-GB
+	dataAccessOptions
+		legacyRedirects
+		returnErrorValuesAsNull
+
+annotation PBI_QueryOrder = ["KPI Overall", "KPI Daily", "KPI Catalog", "Decision Detail", "Threshold Frontier", "Threshold Sensitivity", "Data Quality", "Operations Summary", "Analyst Productivity", "Cost Assumptions", "Segment Merchant Category", "Segment Merchant Country", "Segment Channel", "Segment Entry Mode", "Segment Tenure Band"]
+
+ref expression ExtractsFolder
+
+ref table 'KPI Overall'
+ref table 'KPI Daily'
+ref table 'KPI Catalog'
+ref table 'Decision Detail'
+ref table 'Threshold Frontier'
+ref table 'Threshold Sensitivity'
+ref table 'Data Quality'
+ref table 'Operations Summary'
+ref table 'Analyst Productivity'
+ref table 'Cost Assumptions'
+ref table 'Segment Merchant Category'
+ref table 'Segment Merchant Country'
+ref table 'Segment Channel'
+ref table 'Segment Entry Mode'
+ref table 'Segment Tenure Band'

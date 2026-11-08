@@ -1,0 +1,83 @@
+table 'Data Quality'
+	lineageTag: fdcce5e1-1850-58c1-a2a0-22e8131b3ec3
+
+	measure 'Checks passing' = CALCULATE(COUNTROWS('Data Quality'), 'Data Quality'[severity] = "pass")
+		formatString: #,0
+		lineageTag: 5b715361-daf0-5e8c-93cd-212444f9eb7b
+
+	measure 'Checks total' = COUNTROWS('Data Quality')
+		formatString: #,0
+		lineageTag: a89e3dd7-b466-5212-bef2-7e524e6713ad
+
+	measure 'Publishable' = IF(CALCULATE(COUNTROWS('Data Quality'), 'Data Quality'[severity] <> "pass", 'Data Quality'[blocks_publication] = TRUE()) > 0, "WITHHELD", "PUBLISHABLE")
+		lineageTag: 210c7b48-bfee-512f-9cbd-56ce5db00eb4
+		description: Mirrors QualityReport.publishable - a non-blocking warning does not withhold the refresh.
+
+	column check
+		dataType: string
+		lineageTag: 578a9fc2-a541-5776-ad18-9fa435b441ab
+		summarizeBy: none
+		sourceColumn: check
+
+		annotation SummarizationSetBy = Automatic
+
+	column dimension
+		dataType: string
+		lineageTag: 16a01d37-003a-5427-9f24-372dea28fdd8
+		summarizeBy: none
+		sourceColumn: dimension
+
+		annotation SummarizationSetBy = Automatic
+
+	column measured
+		dataType: double
+		lineageTag: b173dd70-9e4f-59ac-9f3b-6b9061f4ff8f
+		summarizeBy: sum
+		sourceColumn: measured
+
+		annotation SummarizationSetBy = Automatic
+
+	column threshold
+		dataType: double
+		lineageTag: 6f33fbbe-f4b5-59bc-96db-099674593566
+		summarizeBy: sum
+		sourceColumn: threshold
+
+		annotation SummarizationSetBy = Automatic
+
+	column severity
+		dataType: string
+		lineageTag: d2ae1089-f7d5-5032-8e34-947ce26898e3
+		summarizeBy: none
+		sourceColumn: severity
+
+		annotation SummarizationSetBy = Automatic
+
+	column blocks_publication
+		dataType: boolean
+		lineageTag: ad337cd7-7a1d-5c74-9238-43b6a7856651
+		summarizeBy: none
+		sourceColumn: blocks_publication
+
+		annotation SummarizationSetBy = Automatic
+
+	column detail
+		dataType: string
+		lineageTag: 29096fe7-d367-54cd-a5cc-b4cfdaacf0ca
+		summarizeBy: none
+		sourceColumn: detail
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'Data Quality' = m
+		mode: import
+		source =
+				let
+				    Source = Csv.Document(File.Contents(ExtractsFolder & "/data_quality.csv"),
+				        [Delimiter = ",", Encoding = 65001, QuoteStyle = QuoteStyle.Csv]),
+				    Promoted = Table.PromoteHeaders(Source, [PromoteAllScalars = true]),
+				    Typed = Table.TransformColumnTypes(Promoted, {{"check", type text}, {"dimension", type text}, {"measured", type number}, {"threshold", type number}, {"severity", type text}, {"blocks_publication", type logical}, {"detail", type text}})
+				in
+				    Typed
+
+	annotation PBI_ResultType = Table

@@ -1,0 +1,183 @@
+table 'Segment Channel'
+	lineageTag: 2fd60a0c-70f1-58c6-ab5b-3a1d7609de98
+
+	column segment_value
+		dataType: string
+		lineageTag: 8b7aeef1-fb0c-5ea1-88c0-849913d3b9c8
+		summarizeBy: none
+		sourceColumn: segment_value
+
+		annotation SummarizationSetBy = Automatic
+
+	column segment_name
+		dataType: string
+		lineageTag: d277dde3-c761-555f-a7d3-8d15b1bd7c89
+		summarizeBy: none
+		sourceColumn: segment_name
+
+		annotation SummarizationSetBy = Automatic
+
+	column authorizations
+		dataType: double
+		lineageTag: 3bc16e2e-1fa8-5904-8151-da2ffb5c1728
+		summarizeBy: sum
+		sourceColumn: authorizations
+
+		annotation SummarizationSetBy = Automatic
+
+	column authorized_spend
+		dataType: double
+		lineageTag: d3bc9127-1219-5aaf-995a-a80d2092b9d0
+		summarizeBy: sum
+		sourceColumn: authorized_spend
+
+		annotation SummarizationSetBy = Automatic
+
+	column attempted_spend
+		dataType: double
+		lineageTag: 6de8eaa7-0ab6-5221-abb0-ceee6c9d48b1
+		summarizeBy: sum
+		sourceColumn: attempted_spend
+
+		annotation SummarizationSetBy = Automatic
+
+	column decline_rate
+		dataType: double
+		lineageTag: e86cb1e5-abdd-5dc6-a783-64c9ca3bd38a
+		summarizeBy: sum
+		sourceColumn: decline_rate
+
+		annotation SummarizationSetBy = Automatic
+
+	column challenge_rate
+		dataType: double
+		lineageTag: 694e8074-8f29-5c96-b2ac-c90f154ee39b
+		summarizeBy: sum
+		sourceColumn: challenge_rate
+
+		annotation SummarizationSetBy = Automatic
+
+	column review_rate
+		dataType: double
+		lineageTag: 4002ef81-12b5-552f-a617-77d120e3c88b
+		summarizeBy: sum
+		sourceColumn: review_rate
+
+		annotation SummarizationSetBy = Automatic
+
+	column alerts_per_10k
+		dataType: double
+		lineageTag: 3c675654-a2d9-57ed-9dd5-bd0e91123475
+		summarizeBy: sum
+		sourceColumn: alerts_per_10k
+
+		annotation SummarizationSetBy = Automatic
+
+	column rule_override_rate
+		dataType: double
+		lineageTag: 4b05a5dd-a940-5862-a144-75fc3d83797c
+		summarizeBy: sum
+		sourceColumn: rule_override_rate
+
+		annotation SummarizationSetBy = Automatic
+
+	column fraud_prevalence_bps
+		dataType: double
+		lineageTag: 7ab0dfa2-6d0a-51c0-aeff-f40c787ab6fa
+		summarizeBy: sum
+		sourceColumn: fraud_prevalence_bps
+
+		annotation SummarizationSetBy = Automatic
+
+	column detection_rate
+		dataType: double
+		lineageTag: 36f6bc8d-54d1-5d34-a1a4-bcdfd54107cd
+		summarizeBy: sum
+		sourceColumn: detection_rate
+
+		annotation SummarizationSetBy = Automatic
+
+	column value_detection_rate
+		dataType: double
+		lineageTag: 47da941d-9f3e-566a-9f0d-8f87fafbf919
+		summarizeBy: sum
+		sourceColumn: value_detection_rate
+
+		annotation SummarizationSetBy = Automatic
+
+	column precision_at_decline
+		dataType: double
+		lineageTag: 12361bbd-8c96-5c65-a8e2-73eefdceb914
+		summarizeBy: sum
+		sourceColumn: precision_at_decline
+
+		annotation SummarizationSetBy = Automatic
+
+	column false_decline_rate
+		dataType: double
+		lineageTag: 141f4b1c-7a83-51ea-879d-bd98253ac382
+		summarizeBy: sum
+		sourceColumn: false_decline_rate
+
+		annotation SummarizationSetBy = Automatic
+
+	column false_positive_ratio
+		dataType: double
+		lineageTag: 605764c9-aa5a-5f41-afdd-55ba91ab3048
+		summarizeBy: sum
+		sourceColumn: false_positive_ratio
+
+		annotation SummarizationSetBy = Automatic
+
+	column fraud_loss_bps
+		dataType: double
+		lineageTag: c423389f-c23e-5bd2-9af1-8fd2685b9151
+		summarizeBy: sum
+		sourceColumn: fraud_loss_bps
+
+		annotation SummarizationSetBy = Automatic
+
+	column mean_risk_score
+		dataType: double
+		lineageTag: 86353743-d1f6-5f04-9a79-115cd4ff6cb7
+		summarizeBy: sum
+		sourceColumn: mean_risk_score
+
+		annotation SummarizationSetBy = Automatic
+
+	column high_risk_rate
+		dataType: double
+		lineageTag: 1194fe91-0258-589e-ab46-35f1ae06eef8
+		summarizeBy: sum
+		sourceColumn: high_risk_rate
+
+		annotation SummarizationSetBy = Automatic
+
+	column cold_start_rate
+		dataType: double
+		lineageTag: fc1deaf9-9cc2-5525-a0b3-4cb60941bb08
+		summarizeBy: sum
+		sourceColumn: cold_start_rate
+
+		annotation SummarizationSetBy = Automatic
+
+	column label_coverage
+		dataType: double
+		lineageTag: 59c9f1bd-6690-5dfa-a93a-5737ba4918b1
+		summarizeBy: sum
+		sourceColumn: label_coverage
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'Segment Channel' = m
+		mode: import
+		source =
+				let
+				    Source = Csv.Document(File.Contents(ExtractsFolder & "/segment_channel.csv"),
+				        [Delimiter = ",", Encoding = 65001, QuoteStyle = QuoteStyle.Csv]),
+				    Promoted = Table.PromoteHeaders(Source, [PromoteAllScalars = true]),
+				    Typed = Table.TransformColumnTypes(Promoted, {{"segment_value", type text}, {"segment_name", type text}, {"authorizations", type number}, {"authorized_spend", type number}, {"attempted_spend", type number}, {"decline_rate", type number}, {"challenge_rate", type number}, {"review_rate", type number}, {"alerts_per_10k", type number}, {"rule_override_rate", type number}, {"fraud_prevalence_bps", type number}, {"detection_rate", type number}, {"value_detection_rate", type number}, {"precision_at_decline", type number}, {"false_decline_rate", type number}, {"false_positive_ratio", type number}, {"fraud_loss_bps", type number}, {"mean_risk_score", type number}, {"high_risk_rate", type number}, {"cold_start_rate", type number}, {"label_coverage", type number}})
+				in
+				    Typed
+
+	annotation PBI_ResultType = Table

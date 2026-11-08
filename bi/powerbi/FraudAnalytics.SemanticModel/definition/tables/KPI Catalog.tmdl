@@ -1,0 +1,95 @@
+table 'KPI Catalog'
+	lineageTag: fd092b7f-10d7-50c1-8c01-388045b113ea
+
+	column metric_key
+		dataType: string
+		lineageTag: 6915867a-c749-5665-b930-d929fe8f1a09
+		summarizeBy: none
+		sourceColumn: metric_key
+
+		annotation SummarizationSetBy = Automatic
+
+	column metric_label
+		dataType: string
+		lineageTag: 737fd9f7-fa22-5d5d-ba1b-701cbb0e407b
+		summarizeBy: none
+		sourceColumn: metric_label
+
+		annotation SummarizationSetBy = Automatic
+
+	column definition
+		dataType: string
+		lineageTag: 9865265e-375a-5b8d-b54a-7e824ca417fc
+		summarizeBy: none
+		sourceColumn: definition
+
+		annotation SummarizationSetBy = Automatic
+
+	column unit
+		dataType: string
+		lineageTag: 201fb2a4-8070-56bf-85f7-8909dfc0ec74
+		summarizeBy: none
+		sourceColumn: unit
+
+		annotation SummarizationSetBy = Automatic
+
+	column domain
+		dataType: string
+		lineageTag: c3e335de-163b-5a6d-9026-33fd04a65eb5
+		summarizeBy: none
+		sourceColumn: domain
+
+		annotation SummarizationSetBy = Automatic
+
+	column owner
+		dataType: string
+		lineageTag: 3d653f85-dc1c-5bf1-a05c-67112dbc9fe5
+		summarizeBy: none
+		sourceColumn: owner
+
+		annotation SummarizationSetBy = Automatic
+
+	column direction
+		dataType: string
+		lineageTag: e7becb24-aee0-5756-aaff-9c057e2ecd3c
+		summarizeBy: none
+		sourceColumn: direction
+
+		annotation SummarizationSetBy = Automatic
+
+	column requires_settled_label
+		dataType: boolean
+		lineageTag: 21ada1c4-6eb2-5297-8380-4117a6120214
+		summarizeBy: none
+		sourceColumn: requires_settled_label
+
+		annotation SummarizationSetBy = Automatic
+
+	column target
+		dataType: double
+		lineageTag: 700af1e0-c7ca-5005-ab60-84d98a7d9a62
+		summarizeBy: sum
+		sourceColumn: target
+
+		annotation SummarizationSetBy = Automatic
+
+	column tags
+		dataType: string
+		lineageTag: d30ea1cb-0b56-5d39-b6ce-b746c88a609d
+		summarizeBy: none
+		sourceColumn: tags
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'KPI Catalog' = m
+		mode: import
+		source =
+				let
+				    Source = Csv.Document(File.Contents(ExtractsFolder & "/kpi_catalog.csv"),
+				        [Delimiter = ",", Encoding = 65001, QuoteStyle = QuoteStyle.Csv]),
+				    Promoted = Table.PromoteHeaders(Source, [PromoteAllScalars = true]),
+				    Typed = Table.TransformColumnTypes(Promoted, {{"metric_key", type text}, {"metric_label", type text}, {"definition", type text}, {"unit", type text}, {"domain", type text}, {"owner", type text}, {"direction", type text}, {"requires_settled_label", type logical}, {"target", type number}, {"tags", type text}})
+				in
+				    Typed
+
+	annotation PBI_ResultType = Table

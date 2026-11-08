@@ -1,0 +1,61 @@
+// One measure per governed metric, generated from kpi_catalog.csv.
+// These read the published value - they do not recompute it. The number
+// was computed once in Python under test; re-deriving it in DAX would
+// create a second definition of the same metric.
+
+// Decline precision - Share of declined decisions that were confirmed fraud. Denominator: declines only. (owner: Data Science)
+Decline precision = CALCULATE(SUM('KPI Overall'[value]), 'KPI Overall'[metric_key] = "precision_at_decline")
+
+// Detection rate (recall) - Share of confirmed-fraud authorizations that were declined. Denominator: confirmed fraud only. (owner: Data Science)
+Detection rate (recall) = CALCULATE(SUM('KPI Overall'[value]), 'KPI Overall'[metric_key] = "detection_rate")
+
+// False decline rate - Legitimate authorizations wrongly declined, as a share of LEGITIMATE authorizations only. The metric customers actually feel. (owner: Fraud Strategy)
+False decline rate = CALCULATE(SUM('KPI Overall'[value]), 'KPI Overall'[metric_key] = "false_decline_rate")
+
+// Fraud prevalence - Confirmed-fraud authorizations per 10,000 authorizations. (owner: Fraud Strategy)
+Fraud prevalence = CALCULATE(SUM('KPI Overall'[value]), 'KPI Overall'[metric_key] = "fraud_prevalence_bps")
+
+// Value detection rate - Share of confirmed-fraud VALUE that was declined. Reported alongside detection rate because catching few large frauds beats catching many small ones. (owner: Data Science)
+Value detection rate = CALCULATE(SUM('KPI Overall'[value]), 'KPI Overall'[metric_key] = "value_detection_rate")
+
+// Decline rate - Declined decisions as a share of ALL authorizations. (owner: Fraud Strategy)
+Decline rate = CALCULATE(SUM('KPI Overall'[value]), 'KPI Overall'[metric_key] = "decline_rate")
+
+// Review rate - Share of ALL authorizations queued for human review. (owner: Fraud Operations)
+Review rate = CALCULATE(SUM('KPI Overall'[value]), 'KPI Overall'[metric_key] = "review_rate")
+
+// Rule escalation rate - Share of decisions where a deterministic rule escalated the model's action. (owner: Fraud Strategy)
+Rule escalation rate = CALCULATE(SUM('KPI Overall'[value]), 'KPI Overall'[metric_key] = "rule_override_rate")
+
+// Step-up rate - Share of ALL authorizations sent to a 3-D Secure / OTP challenge. (owner: Fraud Strategy)
+Step-up rate = CALCULATE(SUM('KPI Overall'[value]), 'KPI Overall'[metric_key] = "challenge_rate")
+
+// Alerts per 10k authorizations - Decisions requiring human review per 10,000 authorizations. Drives analyst headcount. (owner: Fraud Operations)
+Alerts per 10k authorizations = CALCULATE(SUM('KPI Overall'[value]), 'KPI Overall'[metric_key] = "alerts_per_10k")
+
+// False positives per catch - Legitimate transactions declined for every fraud caught. The operational framing of precision. (owner: Fraud Operations)
+False positives per catch = CALCULATE(SUM('KPI Overall'[value]), 'KPI Overall'[metric_key] = "false_positive_ratio")
+
+// Fraud loss (bps of spend) - Value of fraud that was NOT declined, per 10,000 units of attempted spend. (owner: Fraud Strategy)
+Fraud loss (bps of spend) = CALCULATE(SUM('KPI Overall'[value]), 'KPI Overall'[metric_key] = "fraud_loss_bps")
+
+// Cold-start rate - Share of authorizations on cards with too little history for the sequence model, scored at the neutral 0.5. High values mean reduced model coverage. (owner: Data Science)
+Cold-start rate = CALCULATE(SUM('KPI Overall'[value]), 'KPI Overall'[metric_key] = "cold_start_rate")
+
+// High-risk rate - Share of authorizations scoring above 0.55. Monitored daily as an early drift signal. (owner: Data Science)
+High-risk rate = CALCULATE(SUM('KPI Overall'[value]), 'KPI Overall'[metric_key] = "high_risk_rate")
+
+// Label coverage - Share of authorizations with a settled fraud outcome. Below ~95% the detection KPIs for that period are not yet reportable. (owner: Data Governance)
+Label coverage = CALCULATE(SUM('KPI Overall'[value]), 'KPI Overall'[metric_key] = "label_coverage")
+
+// Mean risk score - Average blended risk score. A leading drift indicator - moves before labels arrive. (owner: Data Science)
+Mean risk score = CALCULATE(SUM('KPI Overall'[value]), 'KPI Overall'[metric_key] = "mean_risk_score")
+
+// Attempted spend - Total value of all authorization attempts, blocked or not. (owner: Fraud Strategy)
+Attempted spend = CALCULATE(SUM('KPI Overall'[value]), 'KPI Overall'[metric_key] = "attempted_spend")
+
+// Authorizations - Count of authorization decisions scored by the platform. (owner: Fraud Strategy)
+Authorizations = CALCULATE(SUM('KPI Overall'[value]), 'KPI Overall'[metric_key] = "authorizations")
+
+// Authorized spend - Total value of transactions the platform approved or challenged (i.e. not blocked). (owner: Fraud Strategy)
+Authorized spend = CALCULATE(SUM('KPI Overall'[value]), 'KPI Overall'[metric_key] = "authorized_spend")

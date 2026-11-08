@@ -1,0 +1,151 @@
+table 'KPI Daily'
+	lineageTag: 1cb4e761-57ba-5998-99ca-0a80ecb4e4e7
+
+	measure 'Decline precision (daily)' = CALCULATE(SUM('KPI Daily'[value]), 'KPI Daily'[metric_key] = "precision_at_decline")
+		formatString: 0.00%
+		lineageTag: 412e8a80-b5c5-5f76-9a9f-d3815a3a4e70
+		displayFolder: Detection
+
+	measure 'Detection rate (recall) (daily)' = CALCULATE(SUM('KPI Daily'[value]), 'KPI Daily'[metric_key] = "detection_rate")
+		formatString: 0.00%
+		lineageTag: 8452da26-2a7f-5e07-aea9-43724a948c1b
+		displayFolder: Detection
+
+	measure 'False decline rate (daily)' = CALCULATE(SUM('KPI Daily'[value]), 'KPI Daily'[metric_key] = "false_decline_rate")
+		formatString: 0.00%
+		lineageTag: b5521093-8320-54ef-bab7-3f4a727ddb55
+		displayFolder: Detection
+
+	measure 'Fraud prevalence (daily)' = CALCULATE(SUM('KPI Daily'[value]), 'KPI Daily'[metric_key] = "fraud_prevalence_bps")
+		formatString: #,0.0
+		lineageTag: 0ed41a5f-e5db-585a-8416-dff5720cbb80
+		displayFolder: Detection
+
+	measure 'Value detection rate (daily)' = CALCULATE(SUM('KPI Daily'[value]), 'KPI Daily'[metric_key] = "value_detection_rate")
+		formatString: 0.00%
+		lineageTag: e0e0888c-6c1a-57fd-814e-8629fbc0d507
+		displayFolder: Detection
+
+	measure 'Decline rate (daily)' = CALCULATE(SUM('KPI Daily'[value]), 'KPI Daily'[metric_key] = "decline_rate")
+		formatString: 0.00%
+		lineageTag: 4817aaec-4c8f-5650-a900-8b6515af289b
+		displayFolder: Decisioning
+
+	measure 'Review rate (daily)' = CALCULATE(SUM('KPI Daily'[value]), 'KPI Daily'[metric_key] = "review_rate")
+		formatString: 0.00%
+		lineageTag: 67f024ea-c5b2-5db0-aa28-b71cf08e061c
+		displayFolder: Decisioning
+
+	measure 'Rule escalation rate (daily)' = CALCULATE(SUM('KPI Daily'[value]), 'KPI Daily'[metric_key] = "rule_override_rate")
+		formatString: 0.00%
+		lineageTag: 61b0859a-c4f9-521a-8f12-1986abce50c9
+		displayFolder: Decisioning
+
+	measure 'Step-up rate (daily)' = CALCULATE(SUM('KPI Daily'[value]), 'KPI Daily'[metric_key] = "challenge_rate")
+		formatString: 0.00%
+		lineageTag: 502d05c8-23da-5a6d-b403-517b98b8efb9
+		displayFolder: Decisioning
+
+	measure 'Alerts per 10k authorizations (daily)' = CALCULATE(SUM('KPI Daily'[value]), 'KPI Daily'[metric_key] = "alerts_per_10k")
+		formatString: 0.00
+		lineageTag: af765364-9378-5516-9964-24ce2b758c1c
+		displayFolder: Operations
+
+	measure 'False positives per catch (daily)' = CALCULATE(SUM('KPI Daily'[value]), 'KPI Daily'[metric_key] = "false_positive_ratio")
+		formatString: 0.00
+		lineageTag: babbb023-39d7-5e43-957b-425cb71ee20a
+		displayFolder: Operations
+
+	measure 'Fraud loss (bps of spend) (daily)' = CALCULATE(SUM('KPI Daily'[value]), 'KPI Daily'[metric_key] = "fraud_loss_bps")
+		formatString: #,0.0
+		lineageTag: 24adf433-f5c8-5b46-bb87-66779369e03f
+		displayFolder: Financial
+
+	measure 'Cold-start rate (daily)' = CALCULATE(SUM('KPI Daily'[value]), 'KPI Daily'[metric_key] = "cold_start_rate")
+		formatString: 0.00%
+		lineageTag: 1baf40ec-bd0c-5c1f-90ed-ae49682fea90
+		displayFolder: Model
+
+	measure 'High-risk rate (daily)' = CALCULATE(SUM('KPI Daily'[value]), 'KPI Daily'[metric_key] = "high_risk_rate")
+		formatString: 0.00%
+		lineageTag: 0e2a0fcc-9017-53a2-aa7c-3584a66be834
+		displayFolder: Model
+
+	measure 'Label coverage (daily)' = CALCULATE(SUM('KPI Daily'[value]), 'KPI Daily'[metric_key] = "label_coverage")
+		formatString: 0.00%
+		lineageTag: 675f5033-7d0a-5408-a638-0d40384f7c0d
+		displayFolder: Model
+
+	measure 'Mean risk score (daily)' = CALCULATE(SUM('KPI Daily'[value]), 'KPI Daily'[metric_key] = "mean_risk_score")
+		formatString: 0.00%
+		lineageTag: 8d1d7550-5621-5a18-83de-664328aefa65
+		displayFolder: Model
+
+	measure 'Attempted spend (daily)' = CALCULATE(SUM('KPI Daily'[value]), 'KPI Daily'[metric_key] = "attempted_spend")
+		formatString: #,0
+		lineageTag: fe57865c-2a4c-5ff1-9a7e-6e8e56923738
+		displayFolder: Volume
+
+	measure 'Authorizations (daily)' = CALCULATE(SUM('KPI Daily'[value]), 'KPI Daily'[metric_key] = "authorizations")
+		formatString: #,0
+		lineageTag: 4f8a987d-679d-5158-a069-7590e417216c
+		displayFolder: Volume
+
+	measure 'Authorized spend (daily)' = CALCULATE(SUM('KPI Daily'[value]), 'KPI Daily'[metric_key] = "authorized_spend")
+		formatString: #,0
+		lineageTag: 7f30f21a-619d-59c8-ba7e-964252b70851
+		displayFolder: Volume
+
+	column calendar_date
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: a22810b4-38ea-516f-8e04-d93cc0933c51
+		summarizeBy: none
+		sourceColumn: calendar_date
+
+		annotation SummarizationSetBy = Automatic
+
+	column day_name
+		dataType: string
+		lineageTag: 60296d74-3dfc-5c91-ba6a-501dddcf9df5
+		summarizeBy: none
+		sourceColumn: day_name
+
+		annotation SummarizationSetBy = Automatic
+
+	column is_weekend
+		dataType: boolean
+		lineageTag: 08db7657-c05f-57d1-91d6-375da088b8dd
+		summarizeBy: none
+		sourceColumn: is_weekend
+
+		annotation SummarizationSetBy = Automatic
+
+	column metric_key
+		dataType: string
+		lineageTag: 3ffe967f-b7b3-5514-8c0d-983212826233
+		summarizeBy: none
+		sourceColumn: metric_key
+
+		annotation SummarizationSetBy = Automatic
+
+	column value
+		dataType: double
+		lineageTag: df351713-2909-5e8e-b2d9-79845fbfa8ee
+		summarizeBy: sum
+		sourceColumn: value
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'KPI Daily' = m
+		mode: import
+		source =
+				let
+				    Source = Csv.Document(File.Contents(ExtractsFolder & "/kpi_daily.csv"),
+				        [Delimiter = ",", Encoding = 65001, QuoteStyle = QuoteStyle.Csv]),
+				    Promoted = Table.PromoteHeaders(Source, [PromoteAllScalars = true]),
+				    Typed = Table.TransformColumnTypes(Promoted, {{"calendar_date", type date}, {"day_name", type text}, {"is_weekend", type logical}, {"metric_key", type text}, {"value", type number}})
+				in
+				    Typed
+
+	annotation PBI_ResultType = Table

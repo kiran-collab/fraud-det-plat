@@ -1,0 +1,305 @@
+table 'Decision Detail'
+	lineageTag: 33632797-c433-5f83-99f6-501c3ea9c548
+
+	column decision_sk
+		dataType: double
+		lineageTag: 31ccb578-4860-516f-ac36-8c5d024bd186
+		summarizeBy: sum
+		sourceColumn: decision_sk
+
+		annotation SummarizationSetBy = Automatic
+
+	column transaction_id
+		dataType: string
+		lineageTag: f1a5fc76-a60f-5a47-a3c9-da3bb81a73d1
+		summarizeBy: none
+		sourceColumn: transaction_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column event_time
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: b484d190-11e8-5c77-88ca-772ad72c27a9
+		summarizeBy: none
+		sourceColumn: event_time
+
+		annotation SummarizationSetBy = Automatic
+
+	column calendar_date
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: 56318dc8-2280-5288-996f-223d34774578
+		summarizeBy: none
+		sourceColumn: calendar_date
+
+		annotation SummarizationSetBy = Automatic
+
+	column iso_week
+		dataType: string
+		lineageTag: 63abc17c-57bb-5381-ba1c-38d8447fbb6f
+		summarizeBy: none
+		sourceColumn: iso_week
+
+		annotation SummarizationSetBy = Automatic
+
+	column day_name
+		dataType: string
+		lineageTag: 088637d6-de02-5b3b-aa92-5b38860dd74a
+		summarizeBy: none
+		sourceColumn: day_name
+
+		annotation SummarizationSetBy = Automatic
+
+	column hour_of_day
+		dataType: double
+		lineageTag: e89b8ca3-8787-5216-8895-a9c1bb2dd9cd
+		summarizeBy: sum
+		sourceColumn: hour_of_day
+
+		annotation SummarizationSetBy = Automatic
+
+	column card_id
+		dataType: string
+		lineageTag: af1adab0-fb9a-53f1-8eaf-38081c28aed2
+		summarizeBy: none
+		sourceColumn: card_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column tenure_band
+		dataType: string
+		lineageTag: 42a4b32b-e879-5304-9fbb-82f43b52c20d
+		summarizeBy: none
+		sourceColumn: tenure_band
+
+		annotation SummarizationSetBy = Automatic
+
+	column lifetime_decisions
+		dataType: double
+		lineageTag: 611c7507-41d1-5262-a779-aa7f96a980db
+		summarizeBy: sum
+		sourceColumn: lifetime_decisions
+
+		annotation SummarizationSetBy = Automatic
+
+	column merchant_id
+		dataType: string
+		lineageTag: caae55f9-199c-5eb1-8867-0417efaf4ddc
+		summarizeBy: none
+		sourceColumn: merchant_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column merchant_category
+		dataType: string
+		lineageTag: 6f675076-8194-582a-b92e-191d90151eb1
+		summarizeBy: none
+		sourceColumn: merchant_category
+
+		annotation SummarizationSetBy = Automatic
+
+	column merchant_country
+		dataType: string
+		lineageTag: 95309d30-0853-50ae-b5e2-4354af27fe4e
+		summarizeBy: none
+		sourceColumn: merchant_country
+
+		annotation SummarizationSetBy = Automatic
+
+	column merchant_risk_tier
+		dataType: string
+		lineageTag: 06b3cf01-6dda-5296-b64a-9333c77c7a0d
+		summarizeBy: none
+		sourceColumn: merchant_risk_tier
+
+		annotation SummarizationSetBy = Automatic
+
+	column merchant_volume_band
+		dataType: string
+		lineageTag: 2054c373-aa83-5910-bd81-43f4e3740af9
+		summarizeBy: none
+		sourceColumn: merchant_volume_band
+
+		annotation SummarizationSetBy = Automatic
+
+	column channel
+		dataType: string
+		lineageTag: 465c2bad-c513-51f0-bf95-4ff1e0b22286
+		summarizeBy: none
+		sourceColumn: channel
+
+		annotation SummarizationSetBy = Automatic
+
+	column entry_mode
+		dataType: string
+		lineageTag: 5a1947b2-9bad-54f2-9df0-3c2aa865eaca
+		summarizeBy: none
+		sourceColumn: entry_mode
+
+		annotation SummarizationSetBy = Automatic
+
+	column amount
+		dataType: double
+		lineageTag: ef8f3a13-b210-5e64-8656-fc71a1d04762
+		summarizeBy: sum
+		sourceColumn: amount
+
+		annotation SummarizationSetBy = Automatic
+
+	column risk_score
+		dataType: double
+		lineageTag: f77368ee-49b7-5527-a6b0-b01dc99ae3b9
+		summarizeBy: sum
+		sourceColumn: risk_score
+
+		annotation SummarizationSetBy = Automatic
+
+	column supervised_score
+		dataType: double
+		lineageTag: f79796b2-4c30-5594-a03d-a86ad9729403
+		summarizeBy: sum
+		sourceColumn: supervised_score
+
+		annotation SummarizationSetBy = Automatic
+
+	column anomaly_score
+		dataType: double
+		lineageTag: 7bebf1bd-fc3e-5f5c-9638-9467073f5789
+		summarizeBy: sum
+		sourceColumn: anomaly_score
+
+		annotation SummarizationSetBy = Automatic
+
+	column sequence_score
+		dataType: double
+		lineageTag: 0e7a526e-4323-5586-bd89-875730182088
+		summarizeBy: sum
+		sourceColumn: sequence_score
+
+		annotation SummarizationSetBy = Automatic
+
+	column action
+		dataType: string
+		lineageTag: 7c5d0856-5bef-5e53-b2fc-1ce8f8cb0d65
+		summarizeBy: none
+		sourceColumn: action
+
+		annotation SummarizationSetBy = Automatic
+
+	column action_rank
+		dataType: double
+		lineageTag: ed688e8d-3df6-50cd-91b5-7d7fe764d0ac
+		summarizeBy: sum
+		sourceColumn: action_rank
+
+		annotation SummarizationSetBy = Automatic
+
+	column creates_friction
+		dataType: boolean
+		lineageTag: 828ea7f3-e751-55f0-a089-875096bd5728
+		summarizeBy: none
+		sourceColumn: creates_friction
+
+		annotation SummarizationSetBy = Automatic
+
+	column is_adverse_action
+		dataType: boolean
+		lineageTag: 7a650b40-8337-54bd-a005-689121083ec5
+		summarizeBy: none
+		sourceColumn: is_adverse_action
+
+		annotation SummarizationSetBy = Automatic
+
+	column triggered_rule_count
+		dataType: double
+		lineageTag: 09043dcd-8990-5708-82c1-039de9bd7294
+		summarizeBy: sum
+		sourceColumn: triggered_rule_count
+
+		annotation SummarizationSetBy = Automatic
+
+	column triggered_rules
+		dataType: string
+		lineageTag: 813435a9-0224-5fc6-a14f-f48204a0af3a
+		summarizeBy: none
+		sourceColumn: triggered_rules
+
+		annotation SummarizationSetBy = Automatic
+
+	column is_fraud
+		dataType: boolean
+		lineageTag: 44ebbc8e-30b7-56c5-a175-f64af5efe1c0
+		summarizeBy: none
+		sourceColumn: is_fraud
+
+		annotation SummarizationSetBy = Automatic
+
+	column is_declined
+		dataType: boolean
+		lineageTag: a69945e9-60c2-56d3-b37a-ff29e37e767d
+		summarizeBy: none
+		sourceColumn: is_declined
+
+		annotation SummarizationSetBy = Automatic
+
+	column is_false_decline
+		dataType: boolean
+		lineageTag: ea54e217-8fbf-578b-a995-c6c0e75bd120
+		summarizeBy: none
+		sourceColumn: is_false_decline
+
+		annotation SummarizationSetBy = Automatic
+
+	column is_caught_fraud
+		dataType: boolean
+		lineageTag: 0a42a49d-6074-5d70-ab21-726350038a3e
+		summarizeBy: none
+		sourceColumn: is_caught_fraud
+
+		annotation SummarizationSetBy = Automatic
+
+	column is_missed_fraud
+		dataType: boolean
+		lineageTag: a04f1c13-d37b-523f-889a-51dde16e1403
+		summarizeBy: none
+		sourceColumn: is_missed_fraud
+
+		annotation SummarizationSetBy = Automatic
+
+	column fraud_value_stopped
+		dataType: double
+		lineageTag: 3cd4f3df-1dbd-5d91-9506-c82b78f02a1e
+		summarizeBy: sum
+		sourceColumn: fraud_value_stopped
+
+		annotation SummarizationSetBy = Automatic
+
+	column fraud_value_lost
+		dataType: double
+		lineageTag: 99ec224c-b1d9-5160-8f25-aed249b00bc1
+		summarizeBy: sum
+		sourceColumn: fraud_value_lost
+
+		annotation SummarizationSetBy = Automatic
+
+	column model_version
+		dataType: string
+		lineageTag: cc96e451-ea99-5b38-a13a-9e079076152f
+		summarizeBy: none
+		sourceColumn: model_version
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'Decision Detail' = m
+		mode: import
+		source =
+				let
+				    Source = Csv.Document(File.Contents(ExtractsFolder & "/decision_detail.csv"),
+				        [Delimiter = ",", Encoding = 65001, QuoteStyle = QuoteStyle.Csv]),
+				    Promoted = Table.PromoteHeaders(Source, [PromoteAllScalars = true]),
+				    Typed = Table.TransformColumnTypes(Promoted, {{"decision_sk", type number}, {"transaction_id", type text}, {"event_time", type datetime}, {"calendar_date", type date}, {"iso_week", type text}, {"day_name", type text}, {"hour_of_day", type number}, {"card_id", type text}, {"tenure_band", type text}, {"lifetime_decisions", type number}, {"merchant_id", type text}, {"merchant_category", type text}, {"merchant_country", type text}, {"merchant_risk_tier", type text}, {"merchant_volume_band", type text}, {"channel", type text}, {"entry_mode", type text}, {"amount", type number}, {"risk_score", type number}, {"supervised_score", type number}, {"anomaly_score", type number}, {"sequence_score", type number}, {"action", type text}, {"action_rank", type number}, {"creates_friction", type logical}, {"is_adverse_action", type logical}, {"triggered_rule_count", type number}, {"triggered_rules", type text}, {"is_fraud", type logical}, {"is_declined", type logical}, {"is_false_decline", type logical}, {"is_caught_fraud", type logical}, {"is_missed_fraud", type logical}, {"fraud_value_stopped", type number}, {"fraud_value_lost", type number}, {"model_version", type text}})
+				in
+				    Typed
+
+	annotation PBI_ResultType = Table

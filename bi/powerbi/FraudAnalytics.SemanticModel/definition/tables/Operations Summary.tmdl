@@ -1,0 +1,111 @@
+table 'Operations Summary'
+	lineageTag: 212d16cd-222f-54f8-84c0-d799447cd7d7
+
+	column alerts
+		dataType: double
+		lineageTag: 965b0553-9f4d-574a-99a8-ecb300acf264
+		summarizeBy: sum
+		sourceColumn: alerts
+
+		annotation SummarizationSetBy = Automatic
+
+	column analysts_active
+		dataType: double
+		lineageTag: 7bc2ac9c-6321-568b-afb7-4e39807b4152
+		summarizeBy: sum
+		sourceColumn: analysts_active
+
+		annotation SummarizationSetBy = Automatic
+
+	column avg_handling_minutes
+		dataType: double
+		lineageTag: 527de175-6124-54ab-8786-aabeebf99be1
+		summarizeBy: sum
+		sourceColumn: avg_handling_minutes
+
+		annotation SummarizationSetBy = Automatic
+
+	column median_handling_minutes
+		dataType: double
+		lineageTag: 2a4510eb-2194-5b91-bbb0-2aca58b13cbc
+		summarizeBy: sum
+		sourceColumn: median_handling_minutes
+
+		annotation SummarizationSetBy = Automatic
+
+	column p90_handling_minutes
+		dataType: double
+		lineageTag: 21c15bb3-f126-5286-8657-93382b9a0822
+		summarizeBy: sum
+		sourceColumn: p90_handling_minutes
+
+		annotation SummarizationSetBy = Automatic
+
+	column total_analyst_hours
+		dataType: double
+		lineageTag: 4954d0a5-d9a5-533a-9f09-7624792112c1
+		summarizeBy: sum
+		sourceColumn: total_analyst_hours
+
+		annotation SummarizationSetBy = Automatic
+
+	column sla_breach_rate
+		dataType: double
+		lineageTag: fdfc70f2-b553-5301-bee0-86e02e343f45
+		summarizeBy: sum
+		sourceColumn: sla_breach_rate
+
+		annotation SummarizationSetBy = Automatic
+
+	column open_rate
+		dataType: double
+		lineageTag: 2382d2ec-08e2-5e94-8ac2-780553befc20
+		summarizeBy: sum
+		sourceColumn: open_rate
+
+		annotation SummarizationSetBy = Automatic
+
+	column case_conversion_rate
+		dataType: double
+		lineageTag: 009073f0-9524-5a27-9ad6-c74e676d9c20
+		summarizeBy: sum
+		sourceColumn: case_conversion_rate
+
+		annotation SummarizationSetBy = Automatic
+
+	column analyst_agreement_rate
+		dataType: double
+		lineageTag: 53342e33-726f-546e-9043-878beb9520da
+		summarizeBy: sum
+		sourceColumn: analyst_agreement_rate
+
+		annotation SummarizationSetBy = Automatic
+
+	column review_cost_total
+		dataType: double
+		lineageTag: 39938fab-f1a3-587a-ae66-80238233d859
+		summarizeBy: sum
+		sourceColumn: review_cost_total
+
+		annotation SummarizationSetBy = Automatic
+
+	column value_confirmed_fraud
+		dataType: double
+		lineageTag: 10335bdf-5f34-5792-8272-73be547db028
+		summarizeBy: sum
+		sourceColumn: value_confirmed_fraud
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'Operations Summary' = m
+		mode: import
+		source =
+				let
+				    Source = Csv.Document(File.Contents(ExtractsFolder & "/operations_summary.csv"),
+				        [Delimiter = ",", Encoding = 65001, QuoteStyle = QuoteStyle.Csv]),
+				    Promoted = Table.PromoteHeaders(Source, [PromoteAllScalars = true]),
+				    Typed = Table.TransformColumnTypes(Promoted, {{"alerts", type number}, {"analysts_active", type number}, {"avg_handling_minutes", type number}, {"median_handling_minutes", type number}, {"p90_handling_minutes", type number}, {"total_analyst_hours", type number}, {"sla_breach_rate", type number}, {"open_rate", type number}, {"case_conversion_rate", type number}, {"analyst_agreement_rate", type number}, {"review_cost_total", type number}, {"value_confirmed_fraud", type number}})
+				in
+				    Typed
+
+	annotation PBI_ResultType = Table

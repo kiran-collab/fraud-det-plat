@@ -1,0 +1,267 @@
+table 'KPI Overall'
+	lineageTag: adff72af-e23a-56e5-ad3a-571d3e4152dc
+
+	measure 'Decline precision' = CALCULATE(SUM('KPI Overall'[value]), 'KPI Overall'[metric_key] = "precision_at_decline")
+		formatString: 0.00%
+		lineageTag: ec0b1e80-b346-5af9-8313-9b5f98b7558f
+		displayFolder: Detection
+		description: Share of declined decisions that were confirmed fraud. Denominator: declines only. (owner: Data Science)
+
+	measure 'Decline precision target' = 0.7
+		formatString: 0.00%
+		lineageTag: 6f06090c-9973-520b-acdd-a7ea2928a014
+		displayFolder: Detection\Targets
+
+	measure 'Decline precision status' = IF(ISBLANK([Decline precision]), BLANK(), IF([Decline precision] >= 0.7, "On target", "Off target"))
+		lineageTag: 7ec0e68d-ef95-552b-a428-103667841f82
+		displayFolder: Detection\Targets
+
+	measure 'Detection rate (recall)' = CALCULATE(SUM('KPI Overall'[value]), 'KPI Overall'[metric_key] = "detection_rate")
+		formatString: 0.00%
+		lineageTag: d6941ad4-51c9-5ac8-9ee2-2c7bf5066631
+		displayFolder: Detection
+		description: Share of confirmed-fraud authorizations that were declined. Denominator: confirmed fraud only. (owner: Data Science)
+
+	measure 'Detection rate (recall) target' = 0.3
+		formatString: 0.00%
+		lineageTag: 561e9b78-82de-576a-bbb7-8c44140959aa
+		displayFolder: Detection\Targets
+
+	measure 'Detection rate (recall) status' = IF(ISBLANK([Detection rate (recall)]), BLANK(), IF([Detection rate (recall)] >= 0.3, "On target", "Off target"))
+		lineageTag: 91bf9646-7700-517e-859e-b5b324e5e51b
+		displayFolder: Detection\Targets
+
+	measure 'False decline rate' = CALCULATE(SUM('KPI Overall'[value]), 'KPI Overall'[metric_key] = "false_decline_rate")
+		formatString: 0.00%
+		lineageTag: c5ca6ba4-e6ed-553e-af8a-09e251d3b3c0
+		displayFolder: Detection
+		description: Legitimate authorizations wrongly declined, as a share of LEGITIMATE authorizations only. The metric customers actually feel. (owner: Fraud Strategy)
+
+	measure 'False decline rate target' = 0.0005
+		formatString: 0.00%
+		lineageTag: 470fe2cd-9925-5b66-bd6d-f446ccaae989
+		displayFolder: Detection\Targets
+
+	measure 'False decline rate status' = IF(ISBLANK([False decline rate]), BLANK(), IF([False decline rate] <= 0.0005, "On target", "Off target"))
+		lineageTag: 7ec74d3c-716b-508a-8740-27295698cafd
+		displayFolder: Detection\Targets
+
+	measure 'Fraud prevalence' = CALCULATE(SUM('KPI Overall'[value]), 'KPI Overall'[metric_key] = "fraud_prevalence_bps")
+		formatString: #,0.0
+		lineageTag: 95bc5d00-6dde-5883-af9b-7ccac784accc
+		displayFolder: Detection
+		description: Confirmed-fraud authorizations per 10,000 authorizations. (owner: Fraud Strategy)
+
+	measure 'Value detection rate' = CALCULATE(SUM('KPI Overall'[value]), 'KPI Overall'[metric_key] = "value_detection_rate")
+		formatString: 0.00%
+		lineageTag: 036f4f53-7859-5ca7-97e9-1a31d58bd1d9
+		displayFolder: Detection
+		description: Share of confirmed-fraud VALUE that was declined. Reported alongside detection rate because catching few large frauds beats catching many small ones. (owner: Data Science)
+
+	measure 'Value detection rate target' = 0.6
+		formatString: 0.00%
+		lineageTag: bb29293c-cd2c-596d-a8bd-47d8a2e05d52
+		displayFolder: Detection\Targets
+
+	measure 'Value detection rate status' = IF(ISBLANK([Value detection rate]), BLANK(), IF([Value detection rate] >= 0.6, "On target", "Off target"))
+		lineageTag: c9da3bef-97fe-550a-89b7-facbf84be5e9
+		displayFolder: Detection\Targets
+
+	measure 'Decline rate' = CALCULATE(SUM('KPI Overall'[value]), 'KPI Overall'[metric_key] = "decline_rate")
+		formatString: 0.00%
+		lineageTag: e094c6ee-9dce-54ee-aeea-10e4f6e647b1
+		displayFolder: Decisioning
+		description: Declined decisions as a share of ALL authorizations. (owner: Fraud Strategy)
+
+	measure 'Decline rate target' = 0.004
+		formatString: 0.00%
+		lineageTag: d68c0714-2af9-51f4-ae8e-53051a3d06cb
+		displayFolder: Decisioning\Targets
+
+	measure 'Review rate' = CALCULATE(SUM('KPI Overall'[value]), 'KPI Overall'[metric_key] = "review_rate")
+		formatString: 0.00%
+		lineageTag: 75da835d-c6fd-521c-b968-14ef00fc4ba9
+		displayFolder: Decisioning
+		description: Share of ALL authorizations queued for human review. (owner: Fraud Operations)
+
+	measure 'Rule escalation rate' = CALCULATE(SUM('KPI Overall'[value]), 'KPI Overall'[metric_key] = "rule_override_rate")
+		formatString: 0.00%
+		lineageTag: a38fdb85-9e24-5f20-81c7-3fe74e3fe513
+		displayFolder: Decisioning
+		description: Share of decisions where a deterministic rule escalated the model's action. (owner: Fraud Strategy)
+
+	measure 'Step-up rate' = CALCULATE(SUM('KPI Overall'[value]), 'KPI Overall'[metric_key] = "challenge_rate")
+		formatString: 0.00%
+		lineageTag: 7354d9b2-5022-5bce-872a-bf462734b1cd
+		displayFolder: Decisioning
+		description: Share of ALL authorizations sent to a 3-D Secure / OTP challenge. (owner: Fraud Strategy)
+
+	measure 'Alerts per 10k authorizations' = CALCULATE(SUM('KPI Overall'[value]), 'KPI Overall'[metric_key] = "alerts_per_10k")
+		formatString: 0.00
+		lineageTag: 366c71be-b175-5a0f-b982-af99809121c6
+		displayFolder: Operations
+		description: Decisions requiring human review per 10,000 authorizations. Drives analyst headcount. (owner: Fraud Operations)
+
+	measure 'False positives per catch' = CALCULATE(SUM('KPI Overall'[value]), 'KPI Overall'[metric_key] = "false_positive_ratio")
+		formatString: 0.00
+		lineageTag: a931ac92-ca2d-53ff-846a-88d8f9ef7a00
+		displayFolder: Operations
+		description: Legitimate transactions declined for every fraud caught. The operational framing of precision. (owner: Fraud Operations)
+
+	measure 'Fraud loss (bps of spend)' = CALCULATE(SUM('KPI Overall'[value]), 'KPI Overall'[metric_key] = "fraud_loss_bps")
+		formatString: #,0.0
+		lineageTag: 2b1438c4-6358-501c-8ebe-b85aa7a48e94
+		displayFolder: Financial
+		description: Value of fraud that was NOT declined, per 10,000 units of attempted spend. (owner: Fraud Strategy)
+
+	measure 'Cold-start rate' = CALCULATE(SUM('KPI Overall'[value]), 'KPI Overall'[metric_key] = "cold_start_rate")
+		formatString: 0.00%
+		lineageTag: 98183bc8-b020-5aa0-8322-c61bb680da14
+		displayFolder: Model
+		description: Share of authorizations on cards with too little history for the sequence model, scored at the neutral 0.5. High values mean reduced model coverage. (owner: Data Science)
+
+	measure 'High-risk rate' = CALCULATE(SUM('KPI Overall'[value]), 'KPI Overall'[metric_key] = "high_risk_rate")
+		formatString: 0.00%
+		lineageTag: cf5d004a-21df-5db8-b0bf-8273ffde17b9
+		displayFolder: Model
+		description: Share of authorizations scoring above 0.55. Monitored daily as an early drift signal. (owner: Data Science)
+
+	measure 'Label coverage' = CALCULATE(SUM('KPI Overall'[value]), 'KPI Overall'[metric_key] = "label_coverage")
+		formatString: 0.00%
+		lineageTag: cf32592d-3c59-5381-9410-6bcddcf86850
+		displayFolder: Model
+		description: Share of authorizations with a settled fraud outcome. Below ~95% the detection KPIs for that period are not yet reportable. (owner: Data Governance)
+
+	measure 'Label coverage target' = 0.95
+		formatString: 0.00%
+		lineageTag: ed496e55-abdf-5187-9520-722b1b6bedff
+		displayFolder: Model\Targets
+
+	measure 'Label coverage status' = IF(ISBLANK([Label coverage]), BLANK(), IF([Label coverage] >= 0.95, "On target", "Off target"))
+		lineageTag: c9cfca88-b473-589e-a926-8426632c9487
+		displayFolder: Model\Targets
+
+	measure 'Mean risk score' = CALCULATE(SUM('KPI Overall'[value]), 'KPI Overall'[metric_key] = "mean_risk_score")
+		formatString: 0.00%
+		lineageTag: 8ec19aea-5433-5598-b8ef-00c267490ca6
+		displayFolder: Model
+		description: Average blended risk score. A leading drift indicator - moves before labels arrive. (owner: Data Science)
+
+	measure 'Attempted spend' = CALCULATE(SUM('KPI Overall'[value]), 'KPI Overall'[metric_key] = "attempted_spend")
+		formatString: #,0
+		lineageTag: 613854c8-07f0-5552-a748-08fe1b03ad28
+		displayFolder: Volume
+		description: Total value of all authorization attempts, blocked or not. (owner: Fraud Strategy)
+
+	measure 'Authorizations' = CALCULATE(SUM('KPI Overall'[value]), 'KPI Overall'[metric_key] = "authorizations")
+		formatString: #,0
+		lineageTag: 641bb959-6869-5b48-a23d-845272577bcd
+		displayFolder: Volume
+		description: Count of authorization decisions scored by the platform. (owner: Fraud Strategy)
+
+	measure 'Authorized spend' = CALCULATE(SUM('KPI Overall'[value]), 'KPI Overall'[metric_key] = "authorized_spend")
+		formatString: #,0
+		lineageTag: 37080cce-efa6-53dd-b92a-262406ae35b3
+		displayFolder: Volume
+		description: Total value of transactions the platform approved or challenged (i.e. not blocked). (owner: Fraud Strategy)
+
+	column metric_key
+		dataType: string
+		lineageTag: e726891c-d085-5c74-bd83-4a3bd368d29f
+		summarizeBy: none
+		sourceColumn: metric_key
+
+		annotation SummarizationSetBy = Automatic
+
+	column value
+		dataType: double
+		lineageTag: 36346a02-09ed-59bc-8ab1-a6378762b1cc
+		summarizeBy: sum
+		sourceColumn: value
+
+		annotation SummarizationSetBy = Automatic
+
+	column metric_label
+		dataType: string
+		lineageTag: 19e68ebd-1af6-55aa-a0df-562ccc9abb83
+		summarizeBy: none
+		sourceColumn: metric_label
+
+		annotation SummarizationSetBy = Automatic
+
+	column definition
+		dataType: string
+		lineageTag: 44aff57c-4abe-5647-918e-96b514f3ce34
+		summarizeBy: none
+		sourceColumn: definition
+
+		annotation SummarizationSetBy = Automatic
+
+	column unit
+		dataType: string
+		lineageTag: a60d2164-1901-5c4c-bbb1-8940057dec0b
+		summarizeBy: none
+		sourceColumn: unit
+
+		annotation SummarizationSetBy = Automatic
+
+	column domain
+		dataType: string
+		lineageTag: b0fc1407-2ace-55b4-a06e-9fe187d96432
+		summarizeBy: none
+		sourceColumn: domain
+
+		annotation SummarizationSetBy = Automatic
+
+	column owner
+		dataType: string
+		lineageTag: 1a6c920a-cf81-5813-9a03-3e2aecafa184
+		summarizeBy: none
+		sourceColumn: owner
+
+		annotation SummarizationSetBy = Automatic
+
+	column direction
+		dataType: string
+		lineageTag: e3fe2eac-4828-5d62-acae-24d98489d8b7
+		summarizeBy: none
+		sourceColumn: direction
+
+		annotation SummarizationSetBy = Automatic
+
+	column requires_settled_label
+		dataType: boolean
+		lineageTag: d4605bb8-a680-564a-bf37-5ddc354203d3
+		summarizeBy: none
+		sourceColumn: requires_settled_label
+
+		annotation SummarizationSetBy = Automatic
+
+	column target
+		dataType: double
+		lineageTag: d8c33fce-854f-5291-88bb-f669c6f47079
+		summarizeBy: sum
+		sourceColumn: target
+
+		annotation SummarizationSetBy = Automatic
+
+	column tags
+		dataType: string
+		lineageTag: 956b4ac7-f930-5a54-9437-f825c43c243c
+		summarizeBy: none
+		sourceColumn: tags
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'KPI Overall' = m
+		mode: import
+		source =
+				let
+				    Source = Csv.Document(File.Contents(ExtractsFolder & "/kpi_overall.csv"),
+				        [Delimiter = ",", Encoding = 65001, QuoteStyle = QuoteStyle.Csv]),
+				    Promoted = Table.PromoteHeaders(Source, [PromoteAllScalars = true]),
+				    Typed = Table.TransformColumnTypes(Promoted, {{"metric_key", type text}, {"value", type number}, {"metric_label", type text}, {"definition", type text}, {"unit", type text}, {"domain", type text}, {"owner", type text}, {"direction", type text}, {"requires_settled_label", type logical}, {"target", type number}, {"tags", type text}})
+				in
+				    Typed
+
+	annotation PBI_ResultType = Table
